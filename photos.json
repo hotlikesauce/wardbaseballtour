@@ -1,0 +1,770 @@
+[
+  {
+    "file": "photos/IMG_2967.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_3101.JPG",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_4090.jpg",
+    "stadium": "Busch Stadium",
+    "trip": "2019-kc",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_7779.jpg",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/imagejpeg_0(10).jpg",
+    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "trip": "2024-mex",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_1652.JPG",
+    "stadium": "Yankee Stadium (Old)",
+    "trip": "2008-nyc",
+    "date": "2008-08-15",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_0323.JPG",
+    "stadium": "Angel Stadium",
+    "trip": "2014-ana",
+    "date": "2014-07-04",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_0500.JPG",
+    "stadium": "Turner Field",
+    "trip": "2014-atl",
+    "date": "2014-08-29",
+    "lat": 33.7369,
+    "lng": -84.3884
+  },
+  {
+    "file": "photos/IMG_0502.JPG",
+    "stadium": "Turner Field",
+    "trip": "2014-atl",
+    "date": "2014-08-29",
+    "lat": 33.7358,
+    "lng": -84.3901
+  },
+  {
+    "file": "photos/IMG_0503.JPG",
+    "stadium": "Turner Field",
+    "trip": "2014-atl",
+    "date": "2014-08-29",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_1262.JPG",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2015-04-06",
+    "lat": 29.7567,
+    "lng": -95.3554
+  },
+  {
+    "file": "photos/IMG_1331.JPG",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2015-05-08",
+    "lat": 39.7557,
+    "lng": -104.9947
+  },
+  {
+    "file": "photos/IMG_1667.JPG",
+    "stadium": "Target Field",
+    "trip": "2015-min",
+    "date": "2015-08-28",
+    "lat": 44.9822,
+    "lng": -93.278
+  },
+  {
+    "file": "photos/IMG_1678.JPG",
+    "stadium": "Target Field",
+    "trip": "2015-min",
+    "date": "2015-08-29",
+    "lat": 44.9821,
+    "lng": -93.2781
+  },
+  {
+    "file": "photos/IMG_1817.JPG",
+    "stadium": "Kauffman Stadium",
+    "trip": "2019-kc",
+    "date": "2015-10-09",
+    "lat": 39.0513,
+    "lng": -94.4811
+  },
+  {
+    "file": "photos/IMG_2946.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": "2016-07-14",
+    "lat": 47.6053,
+    "lng": -122.3419
+  },
+  {
+    "file": "photos/IMG_2947.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": "2016-07-14",
+    "lat": 47.6055,
+    "lng": -122.3408
+  },
+  {
+    "file": "photos/IMG_2965.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": "2016-07-16",
+    "lat": 47.6073,
+    "lng": -122.3436
+  },
+  {
+    "file": "photos/IMG_3075.JPG",
+    "stadium": "Rogers Centre",
+    "trip": "2015-tor",
+    "date": "2016-08-12",
+    "lat": 43.639,
+    "lng": -79.3866
+  },
+  {
+    "file": "photos/IMG_3099.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": "2016-08-12",
+    "lat": 43.0848,
+    "lng": -79.0727
+  },
+  {
+    "file": "photos/IMG_3100.JPG",
+    "stadium": "Rogers Centre",
+    "trip": "2015-tor",
+    "date": "2016-08-12",
+    "lat": 43.6414,
+    "lng": -79.3886
+  },
+  {
+    "file": "photos/IMG_3091.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": "2016-08-13",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_3094.JPG",
+    "stadium": "Rogers Centre",
+    "trip": "2015-tor",
+    "date": "2016-08-13",
+    "lat": 43.6413,
+    "lng": -79.3891
+  },
+  {
+    "file": "photos/IMG_1017.JPG",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2017-04-03",
+    "lat": 29.7566,
+    "lng": -95.3556
+  },
+  {
+    "file": "photos/IMG_1154.JPG",
+    "stadium": "T-Mobile Park",
+    "trip": "2016-sea",
+    "date": "2017-06-08",
+    "lat": 47.5932,
+    "lng": -122.3323
+  },
+  {
+    "file": "photos/IMG_1301.JPG",
+    "stadium": "PNC Park",
+    "trip": "2017",
+    "date": "2017-07-01",
+    "lat": 40.4471,
+    "lng": -80.0061
+  },
+  {
+    "file": "photos/IMG_1306.JPG",
+    "stadium": "Great American Ball Park",
+    "trip": "2017",
+    "date": "2017-07-02",
+    "lat": 39.0974,
+    "lng": -84.5071
+  },
+  {
+    "file": "photos/IMG_1310.JPG",
+    "stadium": "Great American Ball Park",
+    "trip": "2017",
+    "date": "2017-07-02",
+    "lat": 39.0979,
+    "lng": -84.5064
+  },
+  {
+    "file": "photos/IMG_1320.JPG",
+    "stadium": "Great American Ball Park",
+    "trip": "2017",
+    "date": "2017-07-02",
+    "lat": 39.0975,
+    "lng": -84.5071
+  },
+  {
+    "file": "photos/IMG_1326.jpg",
+    "stadium": "Truist Park",
+    "trip": "2017",
+    "date": "2017-07-04",
+    "lat": 33.891,
+    "lng": -84.4678
+  },
+  {
+    "file": "photos/IMG_1338.JPG",
+    "stadium": "Truist Park",
+    "trip": "2017",
+    "date": "2017-07-04",
+    "lat": 33.891,
+    "lng": -84.4679
+  },
+  {
+    "file": "photos/IMG_1351.jpg",
+    "stadium": "PNC Park",
+    "trip": "2017",
+    "date": "2017-07-04",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_1356.JPG",
+    "stadium": "Truist Park",
+    "trip": "2017",
+    "date": "2017-07-05",
+    "lat": 33.891,
+    "lng": -84.4673
+  },
+  {
+    "file": "photos/IMG_2357.JPG",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2017-10-14",
+    "lat": 29.7572,
+    "lng": -95.3557
+  },
+  {
+    "file": "photos/20180822_193659.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2018-08-22",
+    "lat": 39.757,
+    "lng": -104.9948
+  },
+  {
+    "file": "photos/20190328_155922.jpg",
+    "stadium": "Tropicana Field",
+    "trip": "2019-fla",
+    "date": "2019-03-28",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20190405_202056.jpg",
+    "stadium": "Tropicana Field",
+    "trip": "2019-fla",
+    "date": "2019-04-05",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20190702_171437.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2019-07-02",
+    "lat": 39.7556,
+    "lng": -104.9947
+  },
+  {
+    "file": "photos/20190725_213317.jpg",
+    "stadium": "Kauffman Stadium",
+    "trip": "2019-kc",
+    "date": "2019-07-25",
+    "lat": 39.0511,
+    "lng": -94.4809
+  },
+  {
+    "file": "photos/20190822_110652.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2019-08-13",
+    "lat": 39.7571,
+    "lng": -104.9937
+  },
+  {
+    "file": "photos/IMG_20191026_155821_442.jpg",
+    "stadium": "Nationals Park",
+    "trip": "2019-ws",
+    "date": "2019-10-26",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20191027_233335.jpg",
+    "stadium": "Nationals Park",
+    "trip": "2019-ws",
+    "date": "2019-10-27",
+    "lat": 38.8725,
+    "lng": -77.0071
+  },
+  {
+    "file": "photos/20191027_233343.jpg",
+    "stadium": "Nationals Park",
+    "trip": "2019-ws",
+    "date": "2019-10-27",
+    "lat": 38.8725,
+    "lng": -77.0071
+  },
+  {
+    "file": "photos/20220627_233110.jpg",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
+    "date": "2022-06-27",
+    "lat": 40.755,
+    "lng": -73.9916
+  },
+  {
+    "file": "photos/20220628_171227.jpg",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
+    "date": "2022-06-28",
+    "lat": 40.7556,
+    "lng": -73.8463
+  },
+  {
+    "file": "photos/20220628_171700.jpg",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
+    "date": "2022-06-28",
+    "lat": 40.7566,
+    "lng": -73.8467
+  },
+  {
+    "file": "photos/IMG_0789.jpg",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
+    "date": "2022-06-28",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20220629_101535.jpg",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
+    "date": "2022-06-29",
+    "lat": 40.7517,
+    "lng": -73.9898
+  },
+  {
+    "file": "photos/20220629_172422.jpg",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
+    "date": "2022-06-29",
+    "lat": 40.7606,
+    "lng": -73.9913
+  },
+  {
+    "file": "photos/20220629_200429.jpg",
+    "stadium": "Yankee Stadium (Old)",
+    "trip": "2008-nyc",
+    "date": "2022-06-29",
+    "lat": 40.7654,
+    "lng": -74.0372
+  },
+  {
+    "file": "photos/20220630_205626.jpg",
+    "stadium": "Citizens Bank Park",
+    "trip": "2022-ne",
+    "date": "2022-06-30",
+    "lat": 39.9056,
+    "lng": -75.167
+  },
+  {
+    "file": "photos/20221020_184442.jpg",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2022-10-20",
+    "lat": 29.7579,
+    "lng": -95.3582
+  },
+  {
+    "file": "photos/IMG_1074.jpg",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2022-10-20",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_20221020_181312_024.jpg",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2022-10-20",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20221105_183623.jpg",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2022-11-05",
+    "lat": 29.7567,
+    "lng": -95.3556
+  },
+  {
+    "file": "photos/IMG_1144.jpg",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
+    "date": "2022-11-05",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20230523_212022.jpg",
+    "stadium": "American Family Field",
+    "trip": "2023-mil",
+    "date": "2023-05-23",
+    "lat": 43.0287,
+    "lng": -87.9717
+  },
+  {
+    "file": "photos/20230709_131902.jpg",
+    "stadium": "Petco Park",
+    "trip": "solo-sd",
+    "date": "2023-07-09",
+    "lat": 32.7068,
+    "lng": -117.1567
+  },
+  {
+    "file": "photos/20230719_144238.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2023-07-19",
+    "lat": 39.7568,
+    "lng": -104.9936
+  },
+  {
+    "file": "photos/20240427_142721.jpg",
+    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "trip": "2024-mex",
+    "date": "2024-04-27",
+    "lat": 19.4045,
+    "lng": -99.0848
+  },
+  {
+    "file": "photos/20240427_150526.jpg",
+    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "trip": "2024-mex",
+    "date": "2024-04-27",
+    "lat": 19.4037,
+    "lng": -99.0857
+  },
+  {
+    "file": "photos/20240428_132006.jpg",
+    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "trip": "2024-mex",
+    "date": "2024-04-28",
+    "lat": 19.4039,
+    "lng": -99.0855
+  },
+  {
+    "file": "photos/20240428_135350.jpg",
+    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "trip": "2024-mex",
+    "date": "2024-04-28",
+    "lat": 19.4039,
+    "lng": -99.0854
+  },
+  {
+    "file": "photos/20240428_150146.jpg",
+    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "trip": "2024-mex",
+    "date": "2024-04-28",
+    "lat": 19.4039,
+    "lng": -99.0855
+  },
+  {
+    "file": "photos/20240510_210733.jpg",
+    "stadium": "Comerica Park",
+    "trip": "2024-det",
+    "date": "2024-05-10",
+    "lat": 42.3393,
+    "lng": -83.0493
+  },
+  {
+    "file": "photos/20240511_175158.jpg",
+    "stadium": "Comerica Park",
+    "trip": "2024-det",
+    "date": "2024-05-11",
+    "lat": 42.3395,
+    "lng": -83.0492
+  },
+  {
+    "file": "photos/20240512_114945.jpg",
+    "stadium": "Comerica Park",
+    "trip": "2024-det",
+    "date": "2024-05-12",
+    "lat": 42.3388,
+    "lng": -83.0505
+  },
+  {
+    "file": "photos/20240827_182716.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2024-08-27",
+    "lat": 39.7567,
+    "lng": -104.9935
+  },
+  {
+    "file": "photos/20250404_141549.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2025-04-04",
+    "lat": 39.7557,
+    "lng": -104.9945
+  },
+  {
+    "file": "photos/20250430_201728.jpg",
+    "stadium": "Progressive Field",
+    "trip": "2026-final",
+    "date": "2025-04-30",
+    "lat": 41.4958,
+    "lng": -81.6844
+  },
+  {
+    "file": "photos/20250430_202559.jpg",
+    "stadium": "Progressive Field",
+    "trip": "2026-final",
+    "date": "2025-04-30",
+    "lat": 41.4958,
+    "lng": -81.6845
+  },
+  {
+    "file": "photos/20250501_111205.jpg",
+    "stadium": "Progressive Field",
+    "trip": "2026-final",
+    "date": "2025-05-01",
+    "lat": 41.5083,
+    "lng": -81.6943
+  },
+  {
+    "file": "photos/20250502_145318.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-02",
+    "lat": 41.948,
+    "lng": -87.6546
+  },
+  {
+    "file": "photos/20250502_151701.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-02",
+    "lat": 41.9476,
+    "lng": -87.6561
+  },
+  {
+    "file": "photos/20250502_153616.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-02",
+    "lat": 41.9481,
+    "lng": -87.656
+  },
+  {
+    "file": "photos/20250503_124535.jpg",
+    "stadium": "Guaranteed Rate Field",
+    "trip": "2026-final",
+    "date": "2025-05-03",
+    "lat": 41.8303,
+    "lng": -87.6353
+  },
+  {
+    "file": "photos/20250503_144118.jpg",
+    "stadium": "Guaranteed Rate Field",
+    "trip": "2026-final",
+    "date": "2025-05-03",
+    "lat": 41.8299,
+    "lng": -87.6344
+  },
+  {
+    "file": "photos/20250503_185346.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-03",
+    "lat": 41.8928,
+    "lng": -87.6223
+  },
+  {
+    "file": "photos/20250504_171351.jpg",
+    "stadium": "Guaranteed Rate Field",
+    "trip": "2026-final",
+    "date": "2025-05-04",
+    "lat": 41.8477,
+    "lng": -87.6309
+  },
+  {
+    "file": "photos/20250505_122041.jpg",
+    "stadium": "Guaranteed Rate Field",
+    "trip": "2026-final",
+    "date": "2025-05-05",
+    "lat": 41.8828,
+    "lng": -87.6232
+  },
+  {
+    "file": "photos/20250505_125655.jpg",
+    "stadium": "Guaranteed Rate Field",
+    "trip": "2026-final",
+    "date": "2025-05-05",
+    "lat": 41.8808,
+    "lng": -87.6262
+  },
+  {
+    "file": "photos/20250505_170026.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-05",
+    "lat": 41.9477,
+    "lng": -87.656
+  },
+  {
+    "file": "photos/20250505_171801.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-05",
+    "lat": 41.9477,
+    "lng": -87.6559
+  },
+  {
+    "file": "photos/20250505_181405.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-05",
+    "lat": 41.9478,
+    "lng": -87.6561
+  },
+  {
+    "file": "photos/20250505_210714.jpg",
+    "stadium": "Wrigley Field",
+    "trip": "2026-final",
+    "date": "2025-05-05",
+    "lat": 41.9478,
+    "lng": -87.656
+  },
+  {
+    "file": "photos/IMG_20250519_181834.heic",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2025-05-19",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20250702_202925.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2025-07-02",
+    "lat": 39.7556,
+    "lng": -104.9945
+  },
+  {
+    "file": "photos/IMG_20250702_211914.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2025-07-02",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20250703_154921.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2025-07-03",
+    "lat": 39.7556,
+    "lng": -104.9946
+  },
+  {
+    "file": "photos/20250801_201255.jpg",
+    "stadium": "Coors Field",
+    "trip": "coors",
+    "date": "2025-08-01",
+    "lat": 39.7556,
+    "lng": -104.9935
+  },
+  {
+    "file": "photos/San_Diego_1993.jpg",
+    "stadium": "Qualcomm Stadium",
+    "trip": "1992-sd",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348.jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348 (1).jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348 (2).jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348 (3).jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083349.jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  }
+]

@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ward Baseball Journey</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Georgia', serif; background: #0a0a0a; color: #f0e6d3; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+#header {
+  background: linear-gradient(135deg, #001428 0%, #002D62 50%, #001428 100%);
+  border-bottom: 3px solid #EB6123;
+  padding: 10px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+#header h1 { font-size: 1.3rem; color: #f0e6d3; }
+#header h1 span { color: #EB6123; }
+.subtitle { font-size: 0.72rem; color: #888; margin-top: 2px; }
+#stats { display: flex; gap: 18px; }
+.stat { text-align: center; }
+.stat-num { font-size: 1.3rem; font-weight: bold; color: #EB6123; }
+.stat-label { color: #777; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+#main { display: flex; flex: 1; overflow: hidden; }
+
+#sidebar {
+  width: 285px; background: #111; border-right: 1px solid #333;
+  overflow-y: auto; flex-shrink: 0; display: flex; flex-direction: column;
+}
+#sidebar::-webkit-scrollbar { width: 6px; }
+#sidebar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+#filters { padding: 10px 12px; border-bottom: 1px solid #222; }
+.filter-label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; margin-top: 8px; }
+.filter-label:first-child { margin-top: 0; }
+.filter-group { display: flex; flex-wrap: wrap; gap: 5px; }
+.filter-btn {
+  padding: 3px 9px; border-radius: 12px; border: 1px solid #444;
+  background: transparent; color: #999; cursor: pointer; font-size: 0.72rem;
+  transition: all 0.2s; font-family: inherit;
+}
+.filter-btn:hover { border-color: #EB6123; color: #ddd; }
+.filter-btn.active { background: #EB6123; border-color: #EB6123; color: #fff; }
+
+#trips-list { padding: 10px 12px; flex: 1; overflow-y: auto; }
+#trips-list h3 { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.trip-item {
+  display: flex; align-items: flex-start; gap: 8px; padding: 7px 8px;
+  border-radius: 6px; cursor: pointer; transition: background 0.15s;
+  margin-bottom: 3px; border: 1px solid transparent;
+}
+.trip-item:hover { background: #1a1a1a; border-color: #333; }
+.trip-item.highlighted { background: #1f1510; border-color: #EB612344; }
+.trip-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; border: 1px solid rgba(255,255,255,0.2); }
+.trip-info { flex: 1; min-width: 0; }
+.trip-name { font-size: 0.78rem; color: #ddd; font-weight: bold; }
+.trip-meta { font-size: 0.68rem; color: #777; margin-top: 1px; }
+.trip-miles { font-size: 0.66rem; color: #EB6123; margin-top: 1px; }
+
+#teams-section { padding: 0 12px 10px; border-top: 1px solid #333; }
+#teams-section h3 { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0 6px; }
+#teams-section h3:hover { color: #999; }
+.team-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 6px; border-radius: 4px; font-size: 0.75rem; }
+.team-row:hover { background: #1a1a1a; }
+.team-name { color: #ddd; font-weight: bold; }
+.team-count { color: #EB6123; font-weight: bold; }
+.team-detail { color: #777; font-size: 0.65rem; margin-left: 4px; }
+
+#map { flex: 1; background: #0a0a0a; position: relative; }
+.basemap-dark { filter: brightness(0.4) saturate(0.7); }
+
+/* Markers */
+.stadium-marker {
+  border-radius: 50%; cursor: pointer; transition: transform 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: bold; color: #fff; text-shadow: 0 0 2px rgba(0,0,0,0.8);
+}
+.stadium-marker:hover { transform: scale(1.4); z-index: 9999 !important; }
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 188, 212, 0.8); }
+  70% { box-shadow: 0 0 0 12px rgba(0, 188, 212, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 188, 212, 0); }
+}
+.marker-final { animation: pulse 2s infinite; }
+
+@keyframes homeglow {
+  0% { box-shadow: 0 0 6px rgba(255,215,0,0.6); }
+  50% { box-shadow: 0 0 14px rgba(255,215,0,0.9); }
+  100% { box-shadow: 0 0 6px rgba(255,215,0,0.6); }
+}
+.marker-home { animation: homeglow 3s infinite; }
+
+/* Info card — fixed in bottom-right corner of map */
+#info-card {
+  position: absolute; bottom: 16px; right: 16px; z-index: 1000;
+  width: 360px; max-height: 70vh; overflow-y: auto;
+  background: rgba(17, 17, 17, 0.95); backdrop-filter: blur(10px);
+  border: 1px solid #333; border-radius: 12px;
+  padding: 0; color: #e0d6c8;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  font-family: Georgia, serif;
+  display: none;
+  transition: opacity 0.2s;
+}
+#info-card.visible { display: block; }
+#info-card::-webkit-scrollbar { width: 4px; }
+#info-card::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+#info-close {
+  position: absolute; top: 8px; right: 10px; background: rgba(0,0,0,0.5); border: none;
+  color: #fff; font-size: 1.1rem; cursor: pointer; line-height: 1;
+  z-index: 10; width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+#info-close:hover { background: rgba(0,0,0,0.8); }
+.info-hero-wrap { position: relative; width: 100%; border-radius: 12px 12px 0 0; overflow: hidden; }
+.info-hero { width: 100%; aspect-ratio: 16/9; object-fit: cover; object-position: center center; display: block; cursor: pointer; }
+.info-hero-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  padding: 24px 14px 10px;
+}
+.info-hero-overlay .info-name { font-size: 1.1rem; font-weight: bold; color: #fff; margin-bottom: 2px; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+.info-hero-overlay .info-city { font-size: 0.78rem; color: #ddd; margin-bottom: 0; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+.info-body { padding: 10px 14px 14px; }
+.info-name { font-size: 1.05rem; font-weight: bold; color: #fff; margin-bottom: 2px; padding-right: 20px; }
+.info-city { font-size: 0.78rem; color: #999; margin-bottom: 8px; }
+.info-trip-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+.info-trip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.info-trip-label { font-size: 0.8rem; font-weight: bold; color: #ccc; }
+.info-who { font-size: 0.78rem; color: #aaa; margin-bottom: 3px; }
+.info-transport { font-size: 0.82rem; color: #bbb; margin-bottom: 5px; }
+.info-notes { font-size: 0.78rem; color: #ccc; line-height: 1.45; margin-top: 6px; border-top: 1px solid #333; padding-top: 6px; }
+.info-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 0.7rem; font-weight: bold; margin-top: 6px; margin-right: 4px;
+}
+.badge-home { background: #FFD700; color: #333; }
+.badge-final { background: #00BCD4; color: #fff; }
+.badge-historical { background: #666; color: #ddd; }
+
+/* Photo strip in info card */
+.info-photos { margin-top: 8px; border-top: 1px solid #333; padding-top: 8px; }
+.info-photos-label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.photo-strip {
+  display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: thin; scrollbar-color: #555 transparent;
+}
+.photo-strip::-webkit-scrollbar { height: 4px; }
+.photo-strip::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+.photo-strip img {
+  height: 80px; width: auto; aspect-ratio: 4/3; object-fit: cover; border-radius: 4px;
+  cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  border: 1px solid #333; flex-shrink: 0;
+}
+.photo-strip img:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.5); border-color: #EB6123; }
+
+/* Game highlights */
+.info-highlights { margin-top: 8px; border-top: 1px solid #333; padding-top: 8px; }
+.info-highlights-label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.highlight-game { margin-bottom: 10px; }
+.highlight-game-header {
+  font-size: 0.75rem; color: #EB6123; font-weight: bold; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.highlight-game-date { color: #888; font-weight: normal; }
+.highlight-strip {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: thin; scrollbar-color: #555 transparent;
+}
+.highlight-strip::-webkit-scrollbar { height: 4px; }
+.highlight-strip::-webkit-scrollbar-thumb { background: #555; border-radius: 2px; }
+.highlight-item {
+  flex-shrink: 0; width: 140px; cursor: pointer;
+  border-radius: 4px; overflow: hidden; border: 1px solid #333;
+  transition: border-color 0.15s, transform 0.15s;
+  background: #1a1a1a;
+}
+.highlight-item:hover { border-color: #EB6123; transform: scale(1.03); }
+.highlight-thumb {
+  width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
+  background: #222;
+}
+.highlight-title {
+  font-size: 0.65rem; color: #ccc; padding: 4px 5px; line-height: 1.3;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.highlight-duration { font-size: 0.6rem; color: #777; padding: 0 5px 3px; }
+
+/* Fullscreen photo lightbox */
+#photo-lightbox {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000;
+  background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+#photo-lightbox.visible { display: flex; }
+#photo-lightbox img {
+  max-width: 90vw; max-height: 90vh; object-fit: contain;
+  border-radius: 6px; box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+}
+#photo-lightbox .lb-close {
+  position: absolute; top: 16px; right: 24px; color: #fff; font-size: 2rem;
+  background: none; border: none; cursor: pointer; z-index: 2001;
+}
+#photo-lightbox .lb-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  color: #fff; font-size: 2.5rem; background: rgba(0,0,0,0.4);
+  border: none; cursor: pointer; padding: 8px 14px; border-radius: 50%;
+}
+#photo-lightbox .lb-nav:hover { background: rgba(255,255,255,0.15); }
+#photo-lightbox .lb-prev { left: 16px; }
+#photo-lightbox .lb-next { right: 16px; }
+#photo-lightbox .lb-counter {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  color: #aaa; font-size: 0.85rem; font-family: Georgia, serif;
+}
+.badge-quest { background: #333; color: #fff; border: 1px solid #555; }
+
+/* Splash screen */
+#splash {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000;
+  background: #000; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; cursor: pointer;
+  transition: opacity 1s ease;
+}
+#splash.fade-out { opacity: 0; pointer-events: none; }
+.splash-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-size: cover; background-position: center;
+  opacity: 0; transition: opacity 1.5s ease;
+}
+.splash-bg.active { opacity: 0.45; }
+@keyframes kenburns1 { from { transform: scale(1) translate(0,0); } to { transform: scale(1.15) translate(-2%,-1%); } }
+@keyframes kenburns2 { from { transform: scale(1.05) translate(1%,0); } to { transform: scale(1.2) translate(-1%,2%); } }
+@keyframes kenburns3 { from { transform: scale(1) translate(-1%,1%); } to { transform: scale(1.18) translate(2%,-1%); } }
+.splash-bg:nth-child(1) { animation: kenburns1 8s ease-in-out infinite alternate; }
+.splash-bg:nth-child(2) { animation: kenburns2 8s ease-in-out infinite alternate; }
+.splash-bg:nth-child(3) { animation: kenburns3 8s ease-in-out infinite alternate; }
+.splash-content {
+  position: relative; z-index: 1; text-align: center;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.9), 0 0 60px rgba(0,0,0,0.7);
+}
+.splash-content h1 { font-size: 3rem; color: #fff; margin-bottom: 8px; letter-spacing: 2px; }
+.splash-content h1 span { color: #EB6123; }
+.splash-content .splash-sub { font-size: 1.1rem; color: #ccc; margin-bottom: 6px; }
+.splash-content .splash-stat { font-size: 1.5rem; color: #EB6123; font-weight: bold; margin: 16px 0 8px; }
+.splash-content .splash-tagline { font-size: 0.95rem; color: #999; font-style: italic; }
+.splash-enter {
+  margin-top: 30px; font-size: 0.8rem; color: #666;
+  letter-spacing: 2px; text-transform: uppercase;
+  animation: pulse-text 2s ease-in-out infinite;
+}
+@keyframes pulse-text { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  #sidebar { width: 100%; max-height: 40vh; }
+  #main { flex-direction: column; }
+  #stats { gap: 10px; }
+  .stat-num { font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-bg"></div>
+  <div class="splash-bg"></div>
+  <div class="splash-bg"></div>
+  <div class="splash-content">
+    <h1>&#9918; <span>Ward</span> Baseball Journey</h1>
+    <div class="splash-sub">James Ward &amp; Taylor Ward</div>
+    <div class="splash-stat">Every MLB Stadium. Father &amp; Son.</div>
+    <div class="splash-tagline">"50 years of season tickets. A lifetime of road trips. One final quest."</div>
+    <div class="splash-enter">Click anywhere to enter</div>
+  </div>
+</div>
+
+<div id="header">
+  <div>
+    <h1>&#9918; <span>Ward</span> Baseball Journey</h1>
+    <div class="subtitle">James Ward &amp; Taylor Ward &middot; A Lifetime of Baseball</div>
+  </div>
+  <div id="stats">
+    <div class="stat"><div class="stat-num" id="stadium-count-num">-</div><div class="stat-label">MLB Venues</div></div>
+    <div class="stat"><div class="stat-num" style="color:#FFD700">&#10003;</div><div class="stat-label">Quest Complete</div></div>
+    <div class="stat"><div class="stat-num" id="total-miles-num">-</div><div class="stat-label">Total Miles</div></div>
+    <div class="stat"><div class="stat-num" id="total-flights-num">-</div><div class="stat-label">Flights</div></div>
+    <div class="stat"><div class="stat-num" id="teams-seen-num">-</div><div class="stat-label">Teams Seen</div></div>
+    <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Yrs Tickets</div></div>
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">WS Rings</div></div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="sidebar">
+    <div id="filters">
+      <div class="filter-label">Who Went</div>
+      <div class="filter-group" id="who-filters">
+        <button class="filter-btn active" data-val="all">All</button>
+        <button class="filter-btn" data-val="dad">Dad + Taylor</button>
+        <button class="filter-btn" data-val="family">Whole Family</button>
+        <button class="filter-btn" data-val="solo">Solo</button>
+        <button class="filter-btn" data-val="other">Other</button>
+      </div>
+      <div class="filter-label">How We Got There</div>
+      <div class="filter-group" id="transport-filters">
+        <button class="filter-btn active" data-val="all">All</button>
+        <button class="filter-btn" data-val="flight">&#9992; Flight</button>
+        <button class="filter-btn" data-val="drive">&#128663; Drive</button>
+        <button class="filter-btn" data-val="train">&#128646; Train</button>
+      </div>
+    </div>
+    <div id="trips-list">
+      <h3>Trips (click to zoom)</h3>
+      <div id="trip-items"></div>
+    </div>
+    <div id="teams-section">
+      <h3 id="teams-toggle" style="cursor:pointer;user-select:none;">Teams Seen <span id="teams-arrow">&#9654;</span></h3>
+      <div id="teams-list" style="display:none;"></div>
+    </div>
+  </div>
+  <div id="map">
+    <div id="info-card">
+      <button id="info-close">&times;</button>
+      <div id="info-content"></div>
+    </div>
+  </div>
+  <div id="photo-lightbox">
+    <button class="lb-close">&times;</button>
+    <button class="lb-nav lb-prev">&#8249;</button>
+    <img src="" alt="">
+    <button class="lb-nav lb-next">&#8250;</button>
+    <div class="lb-counter"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ===================== GEO MATH =====================
+
+function toRad(d) { return d * Math.PI / 180; }
+function toDeg(r) { return r * 180 / Math.PI; }
+
+// Haversine distance in miles
+function haversine(lat1, lng1, lat2, lng2) {
+  var R = 3959;
+  var dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+          Math.sin(dLng/2) * Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Great circle interpolation — returns array of [lat, lng] points
+function greatCircleArc(lat1, lng1, lat2, lng2, nPoints) {
+  var pts = [];
+  var p1 = toRad(lat1), l1 = toRad(lng1);
+  var p2 = toRad(lat2), l2 = toRad(lng2);
+  var d = 2 * Math.asin(Math.sqrt(
+    Math.pow(Math.sin((p1-p2)/2), 2) +
+    Math.cos(p1) * Math.cos(p2) * Math.pow(Math.sin((l1-l2)/2), 2)
+  ));
+  if (d < 0.0001) return [[lat1, lng1], [lat2, lng2]]; // same point
+  for (var i = 0; i <= nPoints; i++) {
+    var f = i / nPoints;
+    var A = Math.sin((1-f)*d) / Math.sin(d);
+    var B = Math.sin(f*d) / Math.sin(d);
+    var x = A * Math.cos(p1) * Math.cos(l1) + B * Math.cos(p2) * Math.cos(l2);
+    var y = A * Math.cos(p1) * Math.sin(l1) + B * Math.cos(p2) * Math.sin(l2);
+    var z = A * Math.sin(p1) + B * Math.sin(p2);
+    pts.push([toDeg(Math.atan2(z, Math.sqrt(x*x + y*y))), toDeg(Math.atan2(y, x))]);
+  }
+  return pts;
+}
+
+// ===================== DATA =====================
+
+var TRIPS = [
+  { id:'home', name:'Home \u2014 Houston', color:'#EB6123', who:'Taylor + Dad', cat:'dad', transport:[], year:'Ongoing',
+    desc:'50 years of season tickets. Never missed an Opening Day.' },
+  { id:'1992-sd', name:'1992 \u2014 San Diego', color:'#4ECDC4', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'1992',
+    desc:'Astros vs Padres. Flew from Houston to Qualcomm.' },
+  { id:'1999-bal', name:'1999 \u2014 Baltimore', color:'#45B7D1', who:'Whole Family', cat:'family', transport:['flight'], year:'1999',
+    desc:'Family trip to Camden Yards.' },
+  { id:'2006-az', name:'May 2007 \u2014 Phoenix', color:'#96CEB4', who:'Whole Family', cat:'family', transport:['flight'], year:'May 2007',
+    desc:'Astros vs D-backs. Whole family went. Astros got crushed every game.' },
+  { id:'2011-az', name:'Aug 2011 \u2014 Phoenix (ASU Move)', color:'#D4AC0D', who:'Taylor + Dad', cat:'dad', transport:['drive'], year:'Aug 2011',
+    desc:'Drove to Phoenix while moving Taylor to ASU. Caught a game at Chase Field.' },
+  { id:'2008-nyc', name:'Aug 2008 \u2014 NYC', color:'#FADA5E', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'Aug 2008',
+    desc:'Old Yankee Stadium. Mariano Rivera loses it in the 9th.' },
+  { id:'nyc-new', name:'Yankee Stadium (New)', color:'#1C2841', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'TBD',
+    desc:'New Yankee Stadium. Opened 2009, across the street from the original.' },
+  { id:'2019-tex', name:'2019 \u2014 Rangers (Dad)', color:'#DDA0DD', who:'Dad Solo', cat:'dad', transport:['flight'], year:'2019',
+    desc:'Dad went to Globe Life Park in 2019.' },
+  { id:'2014-ana', name:'Jul 4, 2014 \u2014 Angels', color:'#FF8A65', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'Jul 2014',
+    desc:'Angel Stadium. July 4th \u2014 Mike Trout walk-off homer.' },
+  { id:'2015-tor', name:'Jun 2015 \u2014 Toronto', color:'#AED6F1', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'Jun 2015',
+    desc:'Rogers Centre. Blue Jays swept the Astros.' },
+  { id:'2015-bos', name:'Jul 2015 \u2014 Boston', color:'#E74C3C', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'Jul 2015',
+    desc:'Fenway Park. Red Sox vs Astros. Correa monster homer over the Green Monster.' },
+  { id:'2015-min', name:'Aug 2015 \u2014 Minneapolis', color:'#82E0AA', who:'Taylor + Dad + James Lagrasta', cat:'dad', transport:['flight'], year:'Aug 2015',
+    desc:'Twins vs Astros at Target Field. James Lagrasta came along.' },
+  { id:'coors', name:'Coors Field \u2014 Denver', color:'#BB8FCE', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'2014+',
+    desc:'Taylor lives in Denver. Dad came for Astros games: 2014, July 4 2021, July 1-3 2025.' },
+  { id:'2016-sea', name:'2016 \u2014 Seattle', color:'#2ECC71', who:'Whole Family', cat:'family', transport:['flight'], year:'2016',
+    desc:'T-Mobile Park. Whole family trip.' },
+  { id:'2017', name:'Jul 2017 \u2014 PIT/CIN/ATL', color:'#F39C12', who:'Taylor + Dad', cat:'dad', transport:['flight','drive'], year:'Jul 2017',
+    desc:'Flew to Pittsburgh (Pirates vs Giants), drove to Cincy (Reds vs Cubs), drove to Atlanta for Astros vs Braves (met whole family). Jul 4th weekend.' },
+  { id:'2018-west', name:'Aug 2018 \u2014 LA/Oak/SF', color:'#3498DB', who:'Taylor + Dad + Whitney (+Mom at LA)', cat:'dad', transport:['flight','drive'], year:'Aug 2018',
+    desc:'Astros vs Dodgers (2g), drove to Oakland (Tigers @ A\'s), then SF (Astros 2g). World Series rematch road trip. Whitney on whole trip, Mom joined for LA.' },
+  { id:'2019-fla', name:'Mar 2019 \u2014 Tampa/Miami', color:'#1ABC9C', who:'Taylor + Dad', cat:'dad', transport:['flight','drive'], year:'Mar 2019',
+    desc:'Astros Opening Day on the road (Tampa x3), drove to Miami (vs Rockies).' },
+  { id:'2019-kc', name:'Jul 2019 \u2014 KC/STL', color:'#E67E22', who:'Taylor + Dad (+Mom STL)', cat:'dad', transport:['flight','drive'], year:'Jul 2019',
+    desc:'Indians vs Royals at KC, then drove to STL for Astros vs Cardinals x3. Met Mom in St. Louis.' },
+  { id:'2019-ws', name:'Oct 2019 \u2014 World Series', color:'#C0392B', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'Oct 2019',
+    desc:'WS Astros vs Nats. Games 3-5 in DC (3 Astros wins), Games 6-7 at home (2 heartbreaking losses). Road team won all 7.' },
+  { id:'2022-ne', name:'May/Jun 2022 \u2014 NY/Philly', color:'#9B59B6', who:'Taylor + Dad + In-Laws', cat:'family', transport:['flight','train'], year:'May/Jun 2022',
+    desc:'Mets vs Astros, then train to Philly for Phillies vs Braves.' },
+  { id:'2023-mil', name:'May 2023 \u2014 Milwaukee', color:'#27AE60', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'May 2023',
+    desc:'American Family Field. Only stadium on trip.' },
+  { id:'2024-det', name:'May 2024 \u2014 Detroit', color:'#FF9800', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'May 2024',
+    desc:'Comerica Park. Only stadium on trip.' },
+  { id:'2026-final', name:'\u2B50 May 2026 \u2014 THE FINAL QUEST', color:'#00BCD4', who:'Taylor + Dad', cat:'dad', transport:['flight','drive'], year:'May 2026',
+    desc:'Cleveland \u2192 flew to Chicago. White Sox (3g) then WRIGLEY \u2014 THE FINAL MLB STADIUM!' },
+];
+
+var STADIUMS = [
+  // q = quest number (chronological order of first visit to each current MLB stadium)
+  // Historical venues (Astrodome, Qualcomm, Old Yankee, etc.) have no quest number
+  { name:'Astrodome', city:'Houston, TX', lat:29.6850, lng:-95.4101, trip:'home',
+    flags:'home historical', who:'Taylor + Dad',
+    notes:'Birth stadium. Home from Day 1. Dad has had season tickets for 50 years. Never missed an Opening Day. The Eighth Wonder of the World.' },
+  { name:'Minute Maid Park', city:'Houston, TX', lat:29.7573, lng:-95.3556, trip:'home', q:1,
+    flags:'home', who:'Taylor + Dad',
+    notes:'Opening Day 2000. Hundreds of visits. Home. POSTSEASON GAMES ATTENDED: 2004 NLCS G5 — Astros 3-0 Cards (Jeff Kent walk-off 3-run HR off Isringhausen, iconic). 2005 NLCS G5 — Cards 5-4 (Pujols MONSTER 3-run HR off Brad Lidge, 9th inning, worst/best/most epic thing ever. Broke Lidge.). 2005 NLDS G4 — Astros 7-6 in 18 innings (Chris Burke walk-off HR, longest playoff game ever, clinched series). 2005 WS G3 — White Sox 7-5 in 14 innings (Geoff Blum HR, painful). 2017 ALCS G1 — Astros 2-1 vs Yankees. 2017 ALCS G2 — Astros 2-1 vs Yankees. 2017 WS G3 — Astros 5-3 vs Dodgers. 2017 WS G4 — Dodgers 6-2. 2019 ALCS G1 — Yankees 7-0. 2019 ALCS G2 — Astros 3-2 (Correa walk-off HR, 11th). 2019 WS G6 — Nats 7-2. 2019 WS G7 — Nats 6-2 (heartbreak). 2021 WS G6 — Braves 7-0 (clinched, painful). 2022 ALCS G1 — Astros 4-2 vs Yankees. 2022 ALCS G2 — Astros 3-2 vs Yankees. 2022 WS G6 — ASTROS 4-1 vs Phillies (Yordan Alvarez 3-run HR, CHAMPIONS). 2023 ALCS G6 — Rangers 9-2 (Adolis Garcia grand slam). 2023 ALCS G7 — Rangers 11-4 (eliminated, rough ending).' },
+  { name:'Qualcomm Stadium', city:'San Diego, CA', lat:32.7831, lng:-117.1196, trip:'1992-sd',
+    flags:'historical', who:'Taylor + Dad',
+    notes:'1992. Astros vs Padres. First road trip stadium. Stadium demolished.' },
+  { name:'Camden Yards', city:'Baltimore, MD', lat:39.2838, lng:-76.6215, trip:'1999-bal', q:2,
+    flags:'', who:'Whole Family',
+    notes:'1999. Whole family trip to Baltimore.' },
+  { name:'Chase Field', city:'Phoenix, AZ', lat:33.4453, lng:-112.0667, trip:'2006-az', q:3,
+    flags:'', who:'Whole Family',
+    notes:'May 2007. Astros vs D-backs. Whole family went. Astros got crushed every single game. Also visited Aug 2011 while moving Taylor to ASU (drove from Houston).' },
+  { name:'Chase Field', city:'Phoenix, AZ', lat:33.4455, lng:-112.0665, trip:'2011-az',
+    flags:'', who:'Taylor + Dad', transport:'\uD83D\uDE97 Drove from Houston',
+    notes:'Aug 2011. Drove from Houston while moving Taylor to ASU. Second visit to Chase Field.' },
+  { name:'Yankee Stadium (Old)', city:'Bronx, NY', lat:40.8296, lng:-73.9272, trip:'2008-nyc',
+    flags:'historical', who:'Taylor + Dad', transport:'\u2708\uFE0F Flight to NYC',
+    notes:'Aug 15, 2008. Yankees vs Royals. 3-3 heading into the 9th \u2014 Mariano Rivera blows the save, Royals win 4-3. Only stadium on trip. Demolished after 2008 season.' },
+  { name:'Yankee Stadium', city:'Bronx, NY', lat:40.8296, lng:-73.9261, trip:'nyc-new',
+    flags:'', who:'Taylor + Dad', transport:'\u2708\uFE0F Flight to NYC',
+    notes:'New Yankee Stadium. Opened 2009 across the street from the original.' },
+  { name:'Globe Life Park', city:'Arlington, TX', lat:32.7512, lng:-97.0832, trip:'2019-tex', q:4,
+    flags:'', who:'Dad',
+    notes:'Dad went in 2019. Stadium replaced by Globe Life Field in 2020.' },
+  { name:'Angel Stadium', city:'Anaheim, CA', lat:33.8003, lng:-117.8827, trip:'2014-ana', q:5,
+    flags:'', who:'Taylor + Dad',
+    notes:'July 4, 2014. Astros vs Angels. Mike Trout hit a walk-off home run on the 4th of July.' },
+  { name:'Target Field', city:'Minneapolis, MN', lat:44.9817, lng:-93.2781, trip:'2015-min', q:6,
+    flags:'', who:'Taylor + Dad + James Lagrasta',
+    notes:'Aug 28-30, 2015. Twins vs Astros. Game 1: Twins 3-0. Game 2: Astros 4-1. Game 3: Twins 7-5. James Lagrasta came along.' },
+  { name:'Rogers Centre', city:'Toronto, ON', lat:43.6414, lng:-79.3894, trip:'2015-tor', q:7,
+    flags:'', who:'Taylor + Dad',
+    notes:'Jun 5-7, 2015. Blue Jays vs Astros. Jays swept: 6-2, 7-2, 7-6. Tough series.' },
+  { name:'Fenway Park', city:'Boston, MA', lat:42.3467, lng:-71.0972, trip:'2015-bos', q:8,
+    flags:'', who:'Taylor + Dad',
+    notes:'Jul 3-5, 2015. Red Sox vs Astros. Game 1: Astros 12-8 (Correa go-ahead HR over the Monster). Game 2: Sox 6-1. Game 3: Sox 5-4 (Correa HR in 7th). One of the great cathedrals of baseball.' },
+  { name:'Coors Field', city:'Denver, CO', lat:39.7559, lng:-104.9942, trip:'coors', q:9,
+    flags:'', who:'Taylor (lives in Denver)',
+    notes:'May 2016 first visit. Taylor lives in Denver now \u2014 been here a million times. Parents came for Astros games: July 4, 2021 and July 1-3, 2025.' },
+  { name:'T-Mobile Park', city:'Seattle, WA', lat:47.5914, lng:-122.3325, trip:'2016-sea', q:10,
+    flags:'', who:'Whole Family',
+    notes:'2016. Whole family trip to Seattle. Taylor also visited Jun 8, 2017 with Molly.' },
+  { name:'PNC Park', city:'Pittsburgh, PA', lat:40.4469, lng:-80.0057, trip:'2017', q:11,
+    flags:'', who:'Taylor + Dad', transport:'\u2708\uFE0F Flew to Pittsburgh',
+    notes:'~Jul 1, 2017. Pirates vs Giants. Giants won 2-1 or 5-3. Flew in to start the PIT \u2192 CIN \u2192 ATL road trip.' },
+  { name:'Great American Ball Park', city:'Cincinnati, OH', lat:39.0979, lng:-84.5081, trip:'2017', q:12,
+    flags:'', who:'Taylor + Dad', transport:'\uD83D\uDE97 Drove from Pittsburgh',
+    notes:'~Jul 1-2, 2017. Reds vs Cubs. Jun 30: Reds 5-0. Jul 1: Cubs 6-2. Drove from Pittsburgh.' },
+  { name:'Truist Park', city:'Atlanta, GA', lat:33.8908, lng:-84.4678, trip:'2017', q:13,
+    flags:'', who:'Whole Family (met there)', transport:'\uD83D\uDE97 Drove from Cincinnati',
+    notes:'Jul 4-5, 2017. Astros vs Braves. Game 1: Astros 16-4. Game 2: Astros 10-4. Absolute demolition. Whole family met up for July 4th.' },
+  { name:'Dodger Stadium', city:'Los Angeles, CA', lat:34.0739, lng:-118.2400, trip:'2018-west', q:14,
+    flags:'', who:'Taylor + Dad + Whitney + Mom', transport:'\u2708\uFE0F Flew to LA',
+    notes:'Aug 3-4, 2018. Astros vs Dodgers \u2014 World Series rematch. Game 1: Astros 2-1 (Verlander 14 K\'s). Game 2: Astros 14-0. Mom joined for the LA games. Whitney on the whole trip.' },
+  { name:'Oakland Coliseum', city:'Oakland, CA', lat:37.7516, lng:-122.2006, trip:'2018-west', q:15,
+    flags:'', who:'Taylor + Dad + Whitney', transport:'\uD83D\uDE97 Drove from LA',
+    notes:'Aug 5, 2018. Tigers @ A\'s. A\'s 6-0. Drove up from LA.' },
+  { name:'Oracle Park', city:'San Francisco, CA', lat:37.7786, lng:-122.3893, trip:'2018-west', q:16,
+    flags:'', who:'Taylor + Dad + Whitney', transport:'\uD83D\uDE97 Drove from Oakland',
+    notes:'Aug 6-7, 2018. Astros vs Giants. Game 1: Astros 3-1. Game 2: Astros 2-1. Clean sweep. Sick seats.' },
+  { name:'Tropicana Field', city:'St. Petersburg, FL', lat:27.7682, lng:-82.6534, trip:'2019-fla', q:17,
+    flags:'', who:'Taylor + Dad', transport:'\uD83D\uDE97 Road trip',
+    notes:'Mar 28-30, 2019. Astros Opening Day on the road. Game 1 (Opening Day): Astros 5-1 (Verlander). Game 2: Rays 4-2 (Morton vs his old team). Game 3: Rays 3-1.' },
+  { name:'loanDepot Park', city:'Miami, FL', lat:25.7781, lng:-80.2196, trip:'2019-fla', q:18,
+    flags:'', who:'Taylor + Dad', transport:'\uD83D\uDE97 Drove from Tampa',
+    notes:'~Mar 31, 2019. Rockies vs Marlins. Marlins 3-0. Drove down from Tampa.' },
+  { name:'Kauffman Stadium', city:'Kansas City, MO', lat:39.0517, lng:-94.4803, trip:'2019-kc', q:19,
+    flags:'', who:'Taylor + Dad', transport:'\uD83D\uDE97 Road trip',
+    notes:'~Jul 25, 2019. Indians vs Royals at Kauffman Stadium. Then drove to St. Louis for the Astros series.' },
+  { name:'Busch Stadium', city:'St. Louis, MO', lat:38.6226, lng:-90.1928, trip:'2019-kc', q:20,
+    flags:'', who:'Taylor + Dad + Mom', transport:'\uD83D\uDE97 Drove from KC',
+    notes:'Jul 26-28, 2019. Astros vs Cardinals. Game 1: Cardinals 5-3. Game 2: Astros 8-2. Game 3: Astros 6-2. Mom met them in St. Louis.' },
+  { name:'Nationals Park', city:'Washington, DC', lat:38.8731, lng:-77.0074, trip:'2019-ws', q:21,
+    flags:'', who:'Taylor + Dad', transport:'\u2708\uFE0F Flight',
+    notes:'Oct 25-27, 2019. World Series Games 3-5 at Nationals Park. Game 3: Astros 4-1 (Greinke). Game 4: Astros 8-1 (Urquidy, Bregman grand slam). Game 5: Astros 7-1 (Cole, 9 K\'s). Then Games 6-7 back at Minute Maid: Game 6: Nats 7-2. Game 7: Nats 6-2. Heartbreak. Road team won all 7 games.' },
+  { name:'Citi Field', city:'Flushing, NY', lat:40.7571, lng:-73.8458, trip:'2022-ne', q:22,
+    flags:'', who:'Taylor + Dad + In-Laws',
+    notes:'Jun 28-29, 2022. Astros vs Mets. Game 1: Astros 9-1 (Kyle Tucker 3-run HR). Game 2: Astros 2-0. Dominated.' },
+  { name:'Citizens Bank Park', city:'Philadelphia, PA', lat:39.9061, lng:-75.1665, trip:'2022-ne', q:23,
+    flags:'', who:'Taylor + Dad + In-Laws', transport:'\uD83D\uDE82 Train from NYC',
+    notes:'~Jun 29-30, 2022. Phillies vs Braves. Jun 28: Braves 5-3. Jun 29: Braves 4-1. Jun 30: Phillies 14-4. Train from NYC with Dad and in-laws.' },
+  { name:'American Family Field', city:'Milwaukee, WI', lat:43.0280, lng:-87.9712, trip:'2023-mil', q:24,
+    flags:'', who:'Taylor + Dad',
+    notes:'May 22-24, 2023. Astros vs Brewers. Game 1: Astros 12-2. Game 2: Brewers 6-0. Game 3: Brewers 4-0. Brewers took the series 2-1.' },
+  { name:'Comerica Park', city:'Detroit, MI', lat:42.3390, lng:-83.0485, trip:'2024-det', q:25,
+    flags:'', who:'Taylor + Dad',
+    notes:'May 10-12, 2024. Astros vs Tigers. Game 1: Astros 5-2 (Valdez, 4-run 8th rally). Game 2: Tigers 8-2 (Canha grand slam). Game 3: Astros 9-3. Astros took the series 2-1.' },
+  { name:'Progressive Field', city:'Cleveland, OH', lat:41.4962, lng:-81.6852, trip:'2026-final', q:26,
+    flags:'', who:'Taylor + Dad',
+    notes:'May 2026. First stop on the final quest.' },
+  { name:'Guaranteed Rate Field', city:'Chicago, IL', lat:41.8299, lng:-87.6338, trip:'2026-final', q:27,
+    flags:'', who:'Taylor + Dad', transport:'\u2708\uFE0F Flew from Cleveland',
+    notes:'May 2026. Astros vs White Sox \u2014 3 games.' },
+  { name:'Wrigley Field', city:'Chicago, IL', lat:41.9484, lng:-87.6553, trip:'2026-final', q:28,
+    flags:'final', who:'Taylor + Dad',
+    notes:'May 2026. Cubs vs Giants. \u2B50 THE FINAL MLB STADIUM. The quest is complete. Father and son. What a ride.' },
+];
+
+// Route segments: each segment has origin, destination, and mode (flight/drive/train)
+// Houston coords for pre-Denver era, Denver coords for post-2016
+var HOU = [29.7573, -95.3556];
+var DEN = [39.7559, -104.9942];
+
+var ROUTES = [
+  // 1992 San Diego — drove from Houston
+  { trip:'1992-sd', segments:[
+    { from:HOU, to:[32.7831,-117.1196], mode:'flight' },
+  ]},
+  // 1999 Baltimore — flew from Houston
+  { trip:'1999-bal', segments:[
+    { from:HOU, to:[39.2838,-76.6215], mode:'flight' },
+  ]},
+  // 2006 Phoenix — flew from Houston
+  { trip:'2006-az', segments:[
+    { from:HOU, to:[33.4453,-112.0667], mode:'flight' },
+  ]},
+  // 2011 Phoenix — drove from Houston (moving Taylor to ASU)
+  { trip:'2011-az', segments:[
+    { from:HOU, to:[33.4453,-112.0667], mode:'drive' },
+  ]},
+  // 2008 NYC — flew from Houston
+  { trip:'2008-nyc', segments:[
+    { from:HOU, to:[40.8296,-73.9272], mode:'flight' },
+  ]},
+  // 2009 Rangers — drove from Houston
+  { trip:'2019-tex', segments:[
+    { from:HOU, to:[32.7512,-97.0832], mode:'flight' },
+  ]},
+  // 2014 Angels — Dad from Houston, Taylor from Denver
+  { trip:'2014-ana', segments:[
+    { from:HOU, to:[33.8003,-117.8827], mode:'flight', label:'Dad' },
+    { from:DEN, to:[33.8003,-117.8827], mode:'flight', label:'Taylor' },
+  ]},
+  // 2015 Minneapolis — Dad from Houston, Taylor from Denver
+  { trip:'2015-min', segments:[
+    { from:HOU, to:[44.9817,-93.2781], mode:'flight', label:'Dad' },
+    { from:DEN, to:[44.9817,-93.2781], mode:'flight', label:'Taylor' },
+  ]},
+  // 2015 Toronto — Dad from Houston, Taylor from Denver
+  { trip:'2015-tor', segments:[
+    { from:HOU, to:[43.6414,-79.3894], mode:'flight', label:'Dad' },
+    { from:DEN, to:[43.6414,-79.3894], mode:'flight', label:'Taylor' },
+  ]},
+  // 2015 Boston — Dad from Houston, Taylor from Denver
+  { trip:'2015-bos', segments:[
+    { from:HOU, to:[42.3467,-71.0972], mode:'flight', label:'Dad' },
+    { from:DEN, to:[42.3467,-71.0972], mode:'flight', label:'Taylor' },
+  ]},
+  // 2016 Seattle — whole family, dual flights
+  { trip:'2016-sea', segments:[
+    { from:HOU, to:[47.5914,-122.3325], mode:'flight', label:'Family' },
+    { from:DEN, to:[47.5914,-122.3325], mode:'flight', label:'Taylor' },
+  ]},
+  // 2017 PIT/CIN/ATL — Dad from Houston, Taylor from Denver, both to PIT, then drove together
+  { trip:'2017', segments:[
+    { from:HOU, to:[40.4469,-80.0057], mode:'flight', label:'Dad' },
+    { from:DEN, to:[40.4469,-80.0057], mode:'flight', label:'Taylor' },
+    { from:[40.4469,-80.0057], to:[39.0979,-84.5081], mode:'drive' },
+    { from:[39.0979,-84.5081], to:[33.8908,-84.4678], mode:'drive' },
+    { from:[33.8908,-84.4678], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[33.8908,-84.4678], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2018 LA/Oak/SF — Dad from Houston, Taylor from Denver, both to LA, drove up coast, flew home from SF
+  { trip:'2018-west', segments:[
+    { from:HOU, to:[34.0739,-118.2400], mode:'flight', label:'Dad' },
+    { from:DEN, to:[34.0739,-118.2400], mode:'flight', label:'Taylor' },
+    { from:[34.0739,-118.2400], to:[37.7516,-122.2006], mode:'drive' },
+    { from:[37.7516,-122.2006], to:[37.7786,-122.3893], mode:'drive' },
+    { from:[37.7786,-122.3893], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[37.7786,-122.3893], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2019 Florida — Dad from Houston, Taylor from Denver, both to Tampa, drove to Miami, flew home
+  { trip:'2019-fla', segments:[
+    { from:HOU, to:[27.7682,-82.6534], mode:'flight', label:'Dad' },
+    { from:DEN, to:[27.7682,-82.6534], mode:'flight', label:'Taylor' },
+    { from:[27.7682,-82.6534], to:[25.7781,-80.2196], mode:'drive' },
+    { from:[25.7781,-80.2196], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[25.7781,-80.2196], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2019 KC/STL — Dad from Houston, Taylor from Denver, both to KC, drove to STL, flew home
+  { trip:'2019-kc', segments:[
+    { from:HOU, to:[39.0517,-94.4803], mode:'flight', label:'Dad' },
+    { from:DEN, to:[39.0517,-94.4803], mode:'flight', label:'Taylor' },
+    { from:[39.0517,-94.4803], to:[38.6226,-90.1928], mode:'drive' },
+    { from:[38.6226,-90.1928], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[38.6226,-90.1928], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2019 World Series DC — Dad from Houston, Taylor from Denver
+  { trip:'2019-ws', segments:[
+    { from:HOU, to:[38.8731,-77.0074], mode:'flight', label:'Dad' },
+    { from:DEN, to:[38.8731,-77.0074], mode:'flight', label:'Taylor' },
+  ]},
+  // 2022 NY/Philly — Dad from Houston, Taylor from Denver, both to NYC, train to Philly, flew home
+  { trip:'2022-ne', segments:[
+    { from:HOU, to:[40.7571,-73.8458], mode:'flight', label:'Dad' },
+    { from:DEN, to:[40.7571,-73.8458], mode:'flight', label:'Taylor' },
+    { from:[40.7571,-73.8458], to:[39.9061,-75.1665], mode:'train' },
+    { from:[39.9061,-75.1665], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[39.9061,-75.1665], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2023 Milwaukee — Dad from Houston, Taylor from Denver
+  { trip:'2023-mil', segments:[
+    { from:HOU, to:[43.0280,-87.9712], mode:'flight', label:'Dad' },
+    { from:DEN, to:[43.0280,-87.9712], mode:'flight', label:'Taylor' },
+    { from:[43.0280,-87.9712], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[43.0280,-87.9712], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2024 Mexico City — Taylor + Molly from Denver (no Dad)
+  // 2024 Detroit — Dad from Houston, Taylor from Denver
+  { trip:'2024-det', segments:[
+    { from:HOU, to:[42.3390,-83.0485], mode:'flight', label:'Dad' },
+    { from:DEN, to:[42.3390,-83.0485], mode:'flight', label:'Taylor' },
+    { from:[42.3390,-83.0485], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[42.3390,-83.0485], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2026 FINAL — Dad from Houston, Taylor from Denver, both to Cleveland, flew CLE->CHI, drove to Wrigley, flew home
+  { trip:'2026-final', segments:[
+    { from:HOU, to:[41.4962,-81.6852], mode:'flight', label:'Dad' },
+    { from:DEN, to:[41.4962,-81.6852], mode:'flight', label:'Taylor' },
+    { from:[41.4962,-81.6852], to:[41.8299,-87.6338], mode:'flight' },
+    { from:[41.8299,-87.6338], to:[41.9484,-87.6553], mode:'drive' },
+    { from:[41.9484,-87.6553], to:HOU, mode:'flight', label:'Dad home' },
+    { from:[41.9484,-87.6553], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+];
+
+// ===================== MAP SETUP =====================
+
+var tripMap = {};
+TRIPS.forEach(function(t) { tripMap[t.id] = t; });
+
+var map = L.map('map', { center: [37.5, -96], zoom: 4, zoomControl: true, attributionControl: false });
+
+// Voyager tiles (warm dark — CSS-filtered for subdued look)
+var darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 19, className: 'basemap-dark'
+}).addTo(map);
+
+// Satellite imagery (ESRI) — shown when zoomed in
+var satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  maxZoom: 19, opacity: 0
+}).addTo(map);
+
+// Labels overlay for satellite view
+var labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 19, opacity: 0, pane: 'overlayPane'
+}).addTo(map);
+
+L.control.attribution({ position: 'bottomright', prefix: false })
+  .addAttribution('\u00A9 OpenStreetMap \u00A9 CARTO \u00A9 Esri')
+  .addTo(map);
+
+// Crossfade between dark and satellite based on zoom
+function updateTileLayers() {
+  var z = map.getZoom();
+  if (z >= 10) {
+    // Full satellite + labels
+    satLayer.setOpacity(1);
+    darkLayer.setOpacity(0);
+    labelsLayer.setOpacity(1);
+  } else if (z >= 7) {
+    // Crossfade zone (zoom 7-9)
+    var t = (z - 7) / 3;
+    satLayer.setOpacity(t);
+    darkLayer.setOpacity(1 - t);
+    labelsLayer.setOpacity(t);
+  } else {
+    // Full dark
+    satLayer.setOpacity(0);
+    darkLayer.setOpacity(1);
+    labelsLayer.setOpacity(0);
+  }
+}
+map.on('zoomend', updateTileLayers);
+updateTileLayers();
+
+// ===================== RENDERING =====================
+
+var markerLayer = L.layerGroup().addTo(map);
+var routeLayer = L.layerGroup().addTo(map);
+var allMarkers = [];
+var activeWho = 'all';
+var activeTransport = 'all';
+var highlightedTrip = null;
+
+// Compute total miles and per-trip miles
+var tripMiles = {};
+var totalMiles = 0;
+var totalFlights = 0;
+
+ROUTES.forEach(function(r) {
+  var miles = 0;
+  var flights = 0;
+  r.segments.forEach(function(seg) {
+    var d = haversine(seg.from[0], seg.from[1], seg.to[0], seg.to[1]);
+    miles += d;
+    if (seg.mode === 'flight') flights++;
+  });
+  tripMiles[r.trip] = Math.round(miles);
+  totalMiles += miles;
+  totalFlights += flights;
+});
+
+document.getElementById('total-miles-num').textContent = Math.round(totalMiles).toLocaleString();
+document.getElementById('total-flights-num').textContent = totalFlights;
+
+// Count unique stadium names
+var uniqueVenues = [];
+STADIUMS.forEach(function(s) { if (uniqueVenues.indexOf(s.name) === -1) uniqueVenues.push(s.name); });
+document.getElementById('stadium-count-num').textContent = uniqueVenues.length;
+
+// ===================== TEAM STATS =====================
+// Map each stadium to its home team
+var STADIUM_TEAMS = {
+  'Astrodome':'Astros', 'Minute Maid Park':'Astros',
+  'Qualcomm Stadium':'Padres', 'Camden Yards':'Orioles',
+  'Chase Field':'D-backs', 'Yankee Stadium (Old)':'Yankees', 'Yankee Stadium':'Yankees',
+  'Globe Life Park':'Rangers', 'Angel Stadium':'Angels',
+  'Target Field':'Twins', 'Rogers Centre':'Blue Jays',
+  'Fenway Park':'Red Sox', 'Coors Field':'Rockies',
+  'Kauffman Stadium':'Royals', 'T-Mobile Park':'Mariners',
+  'PNC Park':'Pirates', 'Great American Ball Park':'Reds',
+  'Truist Park':'Braves', 'Dodger Stadium':'Dodgers',
+  'Oakland Coliseum':'Athletics', 'Oracle Park':'Giants',
+  'Tropicana Field':'Rays', 'loanDepot Park':'Marlins',
+  'Busch Stadium':'Cardinals', 'Nationals Park':'Nationals',
+  'Citi Field':'Mets', 'Citizens Bank Park':'Phillies',
+  'American Family Field':'Brewers', 'Comerica Park':'Tigers',
+  'Progressive Field':'Guardians', 'Guaranteed Rate Field':'White Sox',
+  'Wrigley Field':'Cubs',
+};
+
+// Auto-generate from every stadium visited
+var TEAM_GAMES = [];
+STADIUMS.forEach(function(s) {
+  var homeTeam = STADIUM_TEAMS[s.name];
+  if (!homeTeam) return;
+  var isHome = (s.flags || '').indexOf('home') !== -1;
+  TEAM_GAMES.push({ team: homeTeam, trip: s.trip, loc: isHome ? 'home' : 'away' });
+});
+// Additional home games at Minute Maid (postseason opponents, marquee series)
+['Cardinals','White Sox','Yankees','Red Sox','Nationals','Phillies','Braves','Dodgers','Rays'].forEach(function(t) {
+  TEAM_GAMES.push({ team: t, trip: 'home', loc: 'home' });
+});
+
+// Compute team counts
+var teamCounts = {};
+TEAM_GAMES.forEach(function(g) {
+  if (!teamCounts[g.team]) teamCounts[g.team] = { away: 0, home: 0 };
+  teamCounts[g.team][g.loc]++;
+});
+var teamList = Object.keys(teamCounts).map(function(t) {
+  var c = teamCounts[t];
+  return { team: t, total: c.away + c.home, away: c.away, home: c.home };
+}).sort(function(a, b) { return b.total - a.total || a.team.localeCompare(b.team); });
+
+document.getElementById('teams-seen-num').textContent = teamList.length;
+
+// Render teams list
+var teamsListEl = document.getElementById('teams-list');
+teamList.forEach(function(t) {
+  var detail = [];
+  if (t.away > 0) detail.push(t.away + ' away');
+  if (t.home > 0) detail.push(t.home + ' home');
+  var row = document.createElement('div');
+  row.className = 'team-row';
+  row.innerHTML = '<span class="team-name">' + t.team + '</span>' +
+    '<span><span class="team-count">\u00D7' + t.total + '</span>' +
+    '<span class="team-detail">(' + detail.join(', ') + ')</span></span>';
+  teamsListEl.appendChild(row);
+});
+
+// Toggle teams section
+document.getElementById('teams-toggle').addEventListener('click', function() {
+  var list = document.getElementById('teams-list');
+  var arrow = document.getElementById('teams-arrow');
+  if (list.style.display === 'none') {
+    list.style.display = 'block';
+    arrow.innerHTML = '&#9660;';
+  } else {
+    list.style.display = 'none';
+    arrow.innerHTML = '&#9654;';
+  }
+});
+
+var infoCard = document.getElementById('info-card');
+var infoContent = document.getElementById('info-content');
+document.getElementById('info-close').addEventListener('click', function() {
+  infoCard.classList.remove('visible');
+});
+
+// Prevent map zoom when scrolling inside the info card
+infoCard.addEventListener('mouseenter', function() { map.scrollWheelZoom.disable(); });
+infoCard.addEventListener('mouseleave', function() { map.scrollWheelZoom.enable(); });
+
+// ===================== PHOTOS =====================
+
+var photoData = []; // loaded from photos.json
+var photosByStadium = {}; // stadium name -> [photo entries]
+
+// Load photos.json
+fetch('photos.json').then(function(r) { return r.json(); }).then(function(data) {
+  photoData = data;
+  photosByStadium = {};
+  data.forEach(function(p) {
+    if (!p.stadium) return;
+    if (!photosByStadium[p.stadium]) photosByStadium[p.stadium] = [];
+    photosByStadium[p.stadium].push(p);
+  });
+  console.log('Loaded ' + data.length + ' photos for ' + Object.keys(photosByStadium).length + ' stadiums');
+}).catch(function(e) {
+  console.log('No photos.json found (run scan_photos.py to generate)');
+});
+
+// ===================== HIGHLIGHTS =====================
+
+var highlightData = {}; // keyed by "trip|stadium|date"
+var highlightsByStadium = {}; // stadium name -> [game entries]
+
+fetch('highlights.json').then(function(r) { return r.json(); }).then(function(data) {
+  highlightData = data;
+  highlightsByStadium = {};
+  Object.values(data).forEach(function(g) {
+    if (!g.stadium) return;
+    if (!highlightsByStadium[g.stadium]) highlightsByStadium[g.stadium] = [];
+    highlightsByStadium[g.stadium].push(g);
+  });
+  console.log('Loaded highlights for ' + Object.keys(highlightsByStadium).length + ' stadiums');
+}).catch(function(e) {
+  console.log('No highlights.json found (run cache_highlights.py to generate)');
+});
+
+// Lightbox
+var lightbox = document.getElementById('photo-lightbox');
+var lbImg = lightbox.querySelector('img');
+var lbCounter = lightbox.querySelector('.lb-counter');
+var lbPhotos = [];
+var lbIndex = 0;
+
+function openLightbox(photos, startIndex) {
+  lbPhotos = photos;
+  lbIndex = startIndex || 0;
+  updateLightbox();
+  lightbox.classList.add('visible');
+}
+
+function updateLightbox() {
+  lbImg.src = lbPhotos[lbIndex].file;
+  lbCounter.textContent = (lbIndex + 1) + ' / ' + lbPhotos.length;
+  if (lbPhotos[lbIndex].date) {
+    lbCounter.textContent += '  \u00B7  ' + lbPhotos[lbIndex].date;
+  }
+}
+
+lightbox.querySelector('.lb-close').addEventListener('click', function(e) {
+  e.stopPropagation();
+  lightbox.classList.remove('visible');
+});
+lightbox.addEventListener('click', function(e) {
+  if (e.target === lightbox) lightbox.classList.remove('visible');
+});
+lightbox.querySelector('.lb-prev').addEventListener('click', function(e) {
+  e.stopPropagation();
+  lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length;
+  updateLightbox();
+});
+lightbox.querySelector('.lb-next').addEventListener('click', function(e) {
+  e.stopPropagation();
+  lbIndex = (lbIndex + 1) % lbPhotos.length;
+  updateLightbox();
+});
+document.addEventListener('keydown', function(e) {
+  if (!lightbox.classList.contains('visible')) return;
+  if (e.key === 'Escape') lightbox.classList.remove('visible');
+  if (e.key === 'ArrowLeft') { lbIndex = (lbIndex - 1 + lbPhotos.length) % lbPhotos.length; updateLightbox(); }
+  if (e.key === 'ArrowRight') { lbIndex = (lbIndex + 1) % lbPhotos.length; updateLightbox(); }
+});
+
+function showInfoCard(s) {
+  var trip = tripMap[s.trip] || { name:'?', color:'#888' };
+  var flags = (s.flags || '').split(' ').filter(Boolean);
+  var badges = [];
+  if (s.q && !flags.includes('final')) badges.push('<span class="info-badge badge-quest">#' + s.q + ' of 30</span>');
+  if (flags.includes('home')) badges.push('<span class="info-badge badge-home">\uD83C\uDFE0 Home Stadium</span>');
+  if (flags.includes('final')) badges.push('<span class="info-badge badge-final">\u2B50 #30 FINAL STADIUM</span>');
+  if (flags.includes('historical')) badges.push('<span class="info-badge badge-historical">\uD83C\uDFDB Historical</span>');
+
+  var photos = photosByStadium[s.name] || [];
+
+  // Pick best hero photo (override for specific stadiums)
+  var heroOverrides = {
+    'Citi Field': 3, // IMG_0789 — Taylor + Dad in Astros jerseys
+  };
+  var heroPosition = {
+    'Wrigley Field': 'center 40%',
+    'T-Mobile Park': 'center 80%',
+  };
+  var heroIdx = heroOverrides[s.name] || 0;
+  if (heroIdx >= photos.length) heroIdx = 0;
+
+  // Hero photo + remaining strip
+  var heroHtml = '';
+  var stripHtml = '';
+  if (photos.length > 0) {
+    var hPos = heroPosition[s.name] ? ' style="object-position:' + heroPosition[s.name] + '"' : '';
+    heroHtml = '<div class="info-hero-wrap">' +
+      '<img class="info-hero"' + hPos + ' src="' + photos[heroIdx].file + '" data-idx="' + heroIdx + '" alt="' + s.name + '">' +
+      '<div class="info-hero-overlay">' +
+        '<div class="info-name">' + s.name + '</div>' +
+        '<div class="info-city">' + s.city + '</div>' +
+      '</div></div>';
+    if (photos.length > 1) {
+      stripHtml = '<div class="info-photos">' +
+        '<div class="info-photos-label">\uD83D\uDCF7 ' + photos.length + ' Photos</div>' +
+        '<div class="photo-strip">';
+      photos.forEach(function(p, i) {
+        if (i === heroIdx) return; // skip hero
+        stripHtml += '<img src="' + p.file + '" loading="lazy" data-idx="' + i + '" alt="' + s.name + '">';
+      });
+      stripHtml += '</div></div>';
+    }
+  }
+
+  var nameCity = photos.length > 0 ? '' :
+    '<div style="padding:14px 14px 0;">' +
+      '<div class="info-name">' + s.name + '</div>' +
+      '<div class="info-city">' + s.city + '</div>' +
+    '</div>';
+
+  infoContent.innerHTML =
+    heroHtml +
+    nameCity +
+    '<div class="info-body">' +
+    '<div class="info-trip-row">' +
+      '<div class="info-trip-dot" style="background:' + trip.color + '"></div>' +
+      '<div class="info-trip-label">' + trip.name + '</div>' +
+    '</div>' +
+    '<div class="info-who">\uD83D\uDC65 ' + s.who + '</div>' +
+    (s.transport ? '<div class="info-transport">' + s.transport + '</div>' : '') +
+    (badges.length ? '<div style="margin-bottom:6px">' + badges.join(' ') + '</div>' : '') +
+    '<div class="info-notes">' + s.notes + '</div>';
+
+  // Build highlights section
+  var games = highlightsByStadium[s.name] || [];
+  var hlHtml = '';
+  if (games.length > 0) {
+    var gamesWithHighlights = games.filter(function(g) { return g.highlights && g.highlights.length > 0; });
+    if (gamesWithHighlights.length > 0) {
+      hlHtml = '<div class="info-highlights">' +
+        '<div class="info-highlights-label">&#127909; Game Highlights</div>';
+      gamesWithHighlights.forEach(function(g) {
+        var dateStr = g.date;
+        try { dateStr = new Date(g.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch(e) {}
+        hlHtml += '<div class="highlight-game">' +
+          '<div class="highlight-game-header">' + g.matchup +
+          ' <span class="highlight-game-date">' + dateStr + '</span></div>' +
+          '<div class="highlight-strip">';
+        g.highlights.forEach(function(h) {
+          var thumb = h.thumb || '';
+          var thumbHtml = thumb
+            ? '<img class="highlight-thumb" src="' + thumb + '" loading="lazy" alt="">'
+            : '<div class="highlight-thumb" style="display:flex;align-items:center;justify-content:center;color:#555;font-size:1.5rem;">&#9654;</div>';
+          hlHtml += '<div class="highlight-item" data-url="' + h.url + '">' +
+            thumbHtml +
+            '<div class="highlight-title">' + h.title + '</div>' +
+            (h.duration ? '<div class="highlight-duration">' + h.duration + '</div>' : '') +
+            '</div>';
+        });
+        hlHtml += '</div></div>';
+      });
+      hlHtml += '</div>';
+    }
+  }
+
+  // Order: info → highlights → photos (highlights before photo strip so they're reachable)
+  infoContent.innerHTML += hlHtml + stripHtml + '</div>';
+
+  // Attach click handlers to hero + strip photos
+  if (photos.length > 0) {
+    infoContent.querySelectorAll('.info-hero, .photo-strip img').forEach(function(img) {
+      img.addEventListener('click', function() {
+        openLightbox(photos, parseInt(img.dataset.idx));
+      });
+    });
+  }
+
+  // Attach click handlers for highlight videos
+  infoContent.querySelectorAll('.highlight-item').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var url = el.dataset.url;
+      if (url) window.open(url, '_blank');
+    });
+  });
+
+  infoCard.classList.add('visible');
+}
+
+// ===================== CACHED ROAD ROUTES =====================
+
+var roadCache = {}; // "lat1,lng1-lat2,lng2" -> [[lat,lng], ...]
+
+function roadCacheKey(from, to) {
+  return from[0] + ',' + from[1] + '-' + to[0] + ',' + to[1];
+}
+
+// Load pre-cached road routes from road_routes.json (generated by cache_routes.py)
+fetch('road_routes.json').then(function(r) { return r.json(); }).then(function(data) {
+  roadCache = data;
+  console.log('Loaded ' + Object.keys(data).length + ' cached road routes');
+  renderAll();
+}).catch(function(e) {
+  console.warn('No road_routes.json found — drive routes will show as straight lines. Run: python cache_routes.py');
+});
+
+// ===================== RENDERING =====================
+
+function renderAll() {
+  markerLayer.clearLayers();
+  routeLayer.clearLayers();
+  allMarkers = [];
+
+  var visible = STADIUMS.filter(function(s) {
+    var trip = tripMap[s.trip];
+    if (!trip) return false;
+    // "dad" filter should also show family trips (Dad was there too)
+    if (activeWho === 'dad' && trip.cat !== 'dad' && trip.cat !== 'family') return false;
+    if (activeWho !== 'all' && activeWho !== 'dad' && trip.cat !== activeWho) return false;
+    if (activeTransport !== 'all') {
+      if (!trip.transport || !trip.transport.includes(activeTransport)) return false;
+    }
+    if (highlightedTrip && s.trip !== highlightedTrip) return false;
+    return true;
+  });
+
+  var visibleTripIds = new Set(visible.map(function(s) { return s.trip; }));
+
+  // Draw route arcs & roads
+  ROUTES.forEach(function(r) {
+    if (!visibleTripIds.has(r.trip)) return;
+    var trip = tripMap[r.trip];
+    if (!trip) return;
+
+    r.segments.forEach(function(seg) {
+      var dist = haversine(seg.from[0], seg.from[1], seg.to[0], seg.to[1]);
+
+      if (seg.mode === 'flight') {
+        // Great circle arc for flights
+        var nPts = Math.max(30, Math.round(dist / 20));
+        var arcPoints = greatCircleArc(seg.from[0], seg.from[1], seg.to[0], seg.to[1], nPts);
+        L.polyline(arcPoints, { color: trip.color, weight: 2.5, opacity: 0.7 }).addTo(routeLayer);
+
+        var mid = arcPoints[Math.floor(arcPoints.length / 2)];
+        var iconHtml = '<div style="font-size:14px;text-shadow:0 0 4px rgba(0,0,0,0.8);">\u2708\uFE0F</div>';
+        var midIcon = L.divIcon({ className: '', html: iconHtml, iconSize: [18, 18], iconAnchor: [9, 9] });
+        var tipText = Math.round(dist).toLocaleString() + ' mi';
+        if (seg.label) tipText = seg.label + ' \u2014 ' + tipText;
+        L.marker(mid, { icon: midIcon, interactive: true })
+          .bindTooltip(tipText, { permanent: false, direction: 'top', className: 'mile-tooltip' })
+          .addTo(routeLayer);
+
+      } else {
+        // Drive or train — use real road geometry if available, fallback to straight line
+        var key = roadCacheKey(seg.from, seg.to);
+        var roadPts = roadCache[key];
+        var isDrive = seg.mode === 'drive';
+        var lineOpts = isDrive
+          ? { color: trip.color, weight: 3, opacity: 0.6, dashArray: '8, 6' }
+          : { color: trip.color, weight: 3, opacity: 0.6, dashArray: '3, 7' };
+
+        if (roadPts) {
+          L.polyline(roadPts, lineOpts).addTo(routeLayer);
+        } else {
+          // Fallback: straight line
+          L.polyline([seg.from, seg.to], lineOpts).addTo(routeLayer);
+        }
+
+        // Transport icon at midpoint
+        var pts = roadPts || [seg.from, seg.to];
+        var mid = pts[Math.floor(pts.length / 2)];
+        var emoji = isDrive ? '\uD83D\uDE97' : '\uD83D\uDE82';
+        var iconHtml2 = '<div style="font-size:14px;text-shadow:0 0 4px rgba(0,0,0,0.8);">' + emoji + '</div>';
+        var midIcon2 = L.divIcon({ className: '', html: iconHtml2, iconSize: [18, 18], iconAnchor: [9, 9] });
+        var driveMiles = roadPts
+          ? Math.round(roadPts.reduce(function(sum, pt, i) {
+              if (i === 0) return 0;
+              return sum + haversine(roadPts[i-1][0], roadPts[i-1][1], pt[0], pt[1]);
+            }, 0))
+          : Math.round(dist);
+        var tipText2 = driveMiles.toLocaleString() + ' mi';
+        if (seg.label) tipText2 = seg.label + ' \u2014 ' + tipText2;
+        L.marker(mid, { icon: midIcon2, interactive: true })
+          .bindTooltip(tipText2, { permanent: false, direction: 'top', className: 'mile-tooltip' })
+          .addTo(routeLayer);
+      }
+    });
+  });
+
+  // Draw markers (on top of routes)
+  visible.forEach(function(s) {
+    var trip = tripMap[s.trip];
+    var flags = (s.flags || '').split(' ').filter(Boolean);
+    var isHome = flags.includes('home');
+    var isFinal = flags.includes('final');
+    var hasNum = s.q && !isHome; // show number on non-home quest stadiums
+    var size = isFinal ? 24 : hasNum ? 20 : isHome ? 17 : 13;
+
+    var borderStyle;
+    var cls = 'stadium-marker';
+    if (isHome) {
+      borderStyle = 'border:3px solid #FFD700;';
+      cls += ' marker-home';
+    } else if (isFinal) {
+      borderStyle = 'border:3px solid #fff;';
+      cls += ' marker-final';
+    } else {
+      borderStyle = 'border:2px solid rgba(255,255,255,0.45);';
+    }
+
+    var numHtml = '';
+    if (hasNum) {
+      var fontSize = s.q >= 10 ? 9 : 10;
+      numHtml = '<span style="font-size:' + fontSize + 'px;font-weight:bold;color:#fff;text-shadow:0 0 3px rgba(0,0,0,0.9);line-height:1;">' + s.q + '</span>';
+    } else if (isHome) {
+      numHtml = '<span style="font-size:9px;">&#9918;</span>';
+    }
+
+    var markerHtml = '<div class="' + cls + '" style="width:' + size + 'px;height:' + size + 'px;background:' + trip.color + ';border-radius:50%;' + borderStyle + 'display:flex;align-items:center;justify-content:center;">' + numHtml + '</div>';
+
+    var icon = L.divIcon({
+      className: '',
+      html: markerHtml,
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2]
+    });
+
+    var marker = L.marker([s.lat, s.lng], { icon: icon, zIndexOffset: isFinal ? 1000 : s.q ? s.q : 0 });
+    (function(stadium) {
+      marker.on('click', function() { showInfoCard(stadium); });
+    })(s);
+    markerLayer.addLayer(marker);
+    allMarkers.push({ marker: marker, stadium: s });
+  });
+}
+
+renderAll();
+
+// ===================== SIDEBAR =====================
+
+var tripItemsEl = document.getElementById('trip-items');
+
+TRIPS.forEach(function(trip) {
+  var count = STADIUMS.filter(function(s) { return s.trip === trip.id; }).length;
+  if (count === 0) return;
+
+  var transportIcons = (trip.transport || []).map(function(t) {
+    return t === 'flight' ? '\u2708\uFE0F' : t === 'drive' ? '\uD83D\uDE97' : '\uD83D\uDE82';
+  }).join(' ');
+
+  var miles = tripMiles[trip.id];
+  var milesStr = miles ? miles.toLocaleString() + ' mi' : '';
+
+  var el = document.createElement('div');
+  el.className = 'trip-item';
+  el.dataset.tripId = trip.id;
+  el.innerHTML =
+    '<div class="trip-dot" style="background:' + trip.color + '"></div>' +
+    '<div class="trip-info">' +
+      '<div class="trip-name">' + trip.name + '</div>' +
+      '<div class="trip-meta">' + trip.who + ' ' + transportIcons + '</div>' +
+      '<div class="trip-meta">' + trip.year + ' \u00B7 ' + count + ' stadium' + (count > 1 ? 's' : '') + '</div>' +
+      (milesStr ? '<div class="trip-miles">' + milesStr + '</div>' : '') +
+    '</div>';
+
+  el.addEventListener('click', function() {
+    var wasHighlighted = highlightedTrip === trip.id;
+    highlightedTrip = wasHighlighted ? null : trip.id;
+
+    document.querySelectorAll('.trip-item').forEach(function(t) { t.classList.remove('highlighted'); });
+    if (!wasHighlighted) el.classList.add('highlighted');
+
+    renderAll();
+
+    if (!wasHighlighted) {
+      // Zoom only to the actual stadiums, not the route origin cities
+      var tripStadiums = STADIUMS.filter(function(s) { return s.trip === trip.id; });
+      var bounds = tripStadiums.map(function(s) { return [s.lat, s.lng]; });
+      if (bounds.length === 1) {
+        map.setView(bounds[0], 17); // street-level zoom to see stadium on satellite
+      } else {
+        map.fitBounds(bounds, { padding: [60, 60], maxZoom: 12 });
+      }
+      // Show the most interesting stadium first (prefer final/home flagged stadiums)
+      setTimeout(function() {
+        if (allMarkers.length > 0) {
+          var best = allMarkers[0].stadium;
+          for (var mi = 0; mi < allMarkers.length; mi++) {
+            var f = (allMarkers[mi].stadium.flags || '');
+            if (f.indexOf('final') !== -1) { best = allMarkers[mi].stadium; break; }
+          }
+          showInfoCard(best);
+        }
+      }, 300);
+    } else {
+      map.setView([37.5, -96], 4);
+      infoCard.classList.remove('visible');
+    }
+  });
+
+  tripItemsEl.appendChild(el);
+});
+
+// ===================== FILTERS =====================
+
+document.getElementById('who-filters').addEventListener('click', function(e) {
+  var btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('#who-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  activeWho = btn.dataset.val;
+  highlightedTrip = null;
+  document.querySelectorAll('.trip-item').forEach(function(t) { t.classList.remove('highlighted'); });
+  renderAll();
+});
+
+document.getElementById('transport-filters').addEventListener('click', function(e) {
+  var btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  document.querySelectorAll('#transport-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  activeTransport = btn.dataset.val;
+  highlightedTrip = null;
+  document.querySelectorAll('.trip-item').forEach(function(t) { t.classList.remove('highlighted'); });
+  renderAll();
+});
+
+// ===================== SPLASH SCREEN =====================
+
+(function() {
+  var splash = document.getElementById('splash');
+  var bgs = splash.querySelectorAll('.splash-bg');
+
+  // Curated splash photos — pick iconic stadiums
+  var splashStadiums = [
+    'Wrigley Field', 'Minute Maid Park', 'Fenway Park', 'Coors Field',
+    'PNC Park', 'Dodger Stadium', 'T-Mobile Park', 'Nationals Park',
+    'Yankee Stadium (Old)', 'Oracle Park', 'Guaranteed Rate Field',
+    'Citi Field', 'Progressive Field', 'Truist Park'
+  ];
+
+  function pickSplashPhotos() {
+    var picks = [];
+    // Shuffle and pick one photo per stadium
+    var shuffled = splashStadiums.slice().sort(function() { return Math.random() - 0.5; });
+    for (var i = 0; i < shuffled.length && picks.length < 6; i++) {
+      var photos = photosByStadium[shuffled[i]];
+      if (photos && photos.length > 0) {
+        picks.push(photos[Math.floor(Math.random() * photos.length)].file);
+      }
+    }
+    // Fallback: grab any photos if we don't have enough
+    if (picks.length < 3) {
+      photoData.forEach(function(p) {
+        if (picks.length < 6 && picks.indexOf(p.file) === -1) picks.push(p.file);
+      });
+    }
+    return picks;
+  }
+
+  // Wait for photos to load, then start slideshow
+  var splashInterval;
+  var splashIdx = 0;
+  var splashPhotos = [];
+
+  function startSplash() {
+    splashPhotos = pickSplashPhotos();
+    if (splashPhotos.length === 0) return; // no photos available
+
+    // Preload first 3
+    splashPhotos.slice(0, 3).forEach(function(src) {
+      var img = new Image(); img.src = src;
+    });
+
+    // Set initial backgrounds
+    for (var i = 0; i < bgs.length && i < splashPhotos.length; i++) {
+      bgs[i].style.backgroundImage = 'url(' + splashPhotos[i] + ')';
+    }
+    bgs[0].classList.add('active');
+    splashIdx = 0;
+
+    // Cycle through photos
+    splashInterval = setInterval(function() {
+      bgs[splashIdx % bgs.length].classList.remove('active');
+      splashIdx++;
+      var nextBg = bgs[splashIdx % bgs.length];
+      var nextPhoto = splashPhotos[splashIdx % splashPhotos.length];
+      nextBg.style.backgroundImage = 'url(' + nextPhoto + ')';
+      nextBg.classList.add('active');
+    }, 3000);
+  }
+
+  // Try to start splash after a short delay (photos.json may still be loading)
+  setTimeout(function() {
+    if (photoData.length > 0) {
+      startSplash();
+    } else {
+      // Retry once more after another second
+      setTimeout(function() { startSplash(); }, 1000);
+    }
+  }, 300);
+
+  // Dismiss splash
+  function dismissSplash() {
+    splash.classList.add('fade-out');
+    clearInterval(splashInterval);
+    setTimeout(function() { splash.style.display = 'none'; }, 1000);
+  }
+
+  splash.addEventListener('click', dismissSplash);
+  document.addEventListener('keydown', function(e) {
+    if (splash.style.display !== 'none' && !splash.classList.contains('fade-out')) {
+      dismissSplash();
+    }
+  });
+})();
+
+</script>
+</body>
+</html>
