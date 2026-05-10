@@ -280,6 +280,30 @@
     "lng": -104.9948
   },
   {
+    "file": "photos/20190328_105329.jpg",
+    "stadium": "Tropicana Field",
+    "trip": "2019-fla",
+    "date": "2019-03-28",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/20190329_102202.jpg",
+    "stadium": "Tropicana Field",
+    "trip": "2019-fla",
+    "date": "2019-03-29",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/Snapchat-1531526211.jpg",
+    "stadium": "Tropicana Field",
+    "trip": "2019-fla",
+    "date": "2019-03-29",
+    "lat": null,
+    "lng": null
+  },
+  {
     "file": "photos/20190328_155922.jpg",
     "stadium": "Tropicana Field",
     "trip": "2019-fla",
@@ -289,8 +313,8 @@
   },
   {
     "file": "photos/20190405_202056.jpg",
-    "stadium": "Tropicana Field",
-    "trip": "2019-fla",
+    "stadium": "Minute Maid Park",
+    "trip": "home",
     "date": "2019-04-05",
     "lat": null,
     "lng": null
@@ -554,7 +578,7 @@
   {
     "file": "photos/20250430_201728.jpg",
     "stadium": "Progressive Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-04-30",
     "lat": 41.4958,
     "lng": -81.6844
@@ -562,7 +586,7 @@
   {
     "file": "photos/20250430_202559.jpg",
     "stadium": "Progressive Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-04-30",
     "lat": 41.4958,
     "lng": -81.6845
@@ -570,7 +594,7 @@
   {
     "file": "photos/20250501_111205.jpg",
     "stadium": "Progressive Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-01",
     "lat": 41.5083,
     "lng": -81.6943
@@ -578,7 +602,7 @@
   {
     "file": "photos/20250502_145318.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-02",
     "lat": 41.948,
     "lng": -87.6546
@@ -586,7 +610,7 @@
   {
     "file": "photos/20250502_151701.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-02",
     "lat": 41.9476,
     "lng": -87.6561
@@ -594,7 +618,7 @@
   {
     "file": "photos/20250502_153616.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-02",
     "lat": 41.9481,
     "lng": -87.656
@@ -602,7 +626,7 @@
   {
     "file": "photos/20250503_124535.jpg",
     "stadium": "Guaranteed Rate Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-03",
     "lat": 41.8303,
     "lng": -87.6353
@@ -610,7 +634,7 @@
   {
     "file": "photos/20250503_144118.jpg",
     "stadium": "Guaranteed Rate Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-03",
     "lat": 41.8299,
     "lng": -87.6344
@@ -618,7 +642,7 @@
   {
     "file": "photos/20250503_185346.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-03",
     "lat": 41.8928,
     "lng": -87.6223
@@ -626,7 +650,7 @@
   {
     "file": "photos/20250504_171351.jpg",
     "stadium": "Guaranteed Rate Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-04",
     "lat": 41.8477,
     "lng": -87.6309
@@ -634,7 +658,7 @@
   {
     "file": "photos/20250505_122041.jpg",
     "stadium": "Guaranteed Rate Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-05",
     "lat": 41.8828,
     "lng": -87.6232
@@ -642,7 +666,7 @@
   {
     "file": "photos/20250505_125655.jpg",
     "stadium": "Guaranteed Rate Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-05",
     "lat": 41.8808,
     "lng": -87.6262
@@ -650,7 +674,7 @@
   {
     "file": "photos/20250505_170026.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-05",
     "lat": 41.9477,
     "lng": -87.656
@@ -658,7 +682,7 @@
   {
     "file": "photos/20250505_171801.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-05",
     "lat": 41.9477,
     "lng": -87.6559
@@ -666,7 +690,7 @@
   {
     "file": "photos/20250505_181405.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-05",
     "lat": 41.9478,
     "lng": -87.6561
@@ -674,7 +698,7 @@
   {
     "file": "photos/20250505_210714.jpg",
     "stadium": "Wrigley Field",
-    "trip": "2026-final",
+    "trip": "2025-final",
     "date": "2025-05-05",
     "lat": 41.9478,
     "lng": -87.656
@@ -768,7 +792,7 @@
     "lng": null
   },
   {
-    "file": "photos/20260313_190242.jpg",
+    "file": "photos/IMG_20260313_210242 (1).jpg",
     "stadium": "Minute Maid Park (WBC 2026)",
     "trip": "2026-wbc",
     "date": "2026-03-13",
@@ -776,7 +800,7 @@
     "lng": null
   },
   {
-    "file": "photos/IMG_20260313_210242 (1).jpg",
+    "file": "photos/20260313_190242.jpg",
     "stadium": "Minute Maid Park (WBC 2026)",
     "trip": "2026-wbc",
     "date": "2026-03-13",

@@ -521,7 +521,7 @@ var TRIPS = [
     desc:'American Family Field. Only stadium on trip.' },
   { id:'2024-det', name:'May 2024 \u2014 Detroit', color:'#FF9800', who:'Taylor + Dad', cat:'dad', transport:['flight'], year:'May 2024',
     desc:'Comerica Park. Only stadium on trip.' },
-  { id:'2026-final', name:'\u2B50 May 2026 \u2014 THE FINAL QUEST', color:'#00BCD4', who:'Taylor + Dad', cat:'dad', transport:['flight','drive'], year:'May 2026',
+  { id:'2025-final', name:'\u2B50 May 2025 \u2014 THE FINAL QUEST', color:'#00BCD4', who:'Taylor + Dad', cat:'dad', transport:['flight','drive'], year:'May 2025',
     desc:'Cleveland \u2192 flew to Chicago. White Sox (3g) then WRIGLEY \u2014 THE FINAL MLB STADIUM!' },
   { id:'2026-wbc', name:'Mar 2026 \u2014 World Baseball Classic', color:'#BF0D3E', who:'Taylor + Dad + Mom', cat:'family', transport:['flight'], year:'Mar 2026',
     desc:'6 WBC Super Round games at Minute Maid Park in Houston, Mar 9\u201315, 2026. Opened with USA vs Mexico on Mar 9. Closed with Puerto Rico vs Italy. Taylor flew in from Denver; Mom and Dad were home. All three in Team USA jerseys.' },
@@ -620,15 +620,15 @@ var STADIUMS = [
   { name:'Comerica Park', city:'Detroit, MI', lat:42.3390, lng:-83.0485, trip:'2024-det', q:25,
     flags:'', who:'Taylor + Dad',
     notes:'May 10-12, 2024. Astros vs Tigers. Game 1: Astros 5-2 (Valdez, 4-run 8th rally). Game 2: Tigers 8-2 (Canha grand slam). Game 3: Astros 9-3. Astros took the series 2-1.' },
-  { name:'Progressive Field', city:'Cleveland, OH', lat:41.4962, lng:-81.6852, trip:'2026-final', q:26,
+  { name:'Progressive Field', city:'Cleveland, OH', lat:41.4962, lng:-81.6852, trip:'2025-final', q:26,
     flags:'', who:'Taylor + Dad',
-    notes:'May 2026. First stop on the final quest.' },
-  { name:'Guaranteed Rate Field', city:'Chicago, IL', lat:41.8299, lng:-87.6338, trip:'2026-final', q:27,
+    notes:'May 2025. First stop on the final quest.' },
+  { name:'Guaranteed Rate Field', city:'Chicago, IL', lat:41.8299, lng:-87.6338, trip:'2025-final', q:27,
     flags:'', who:'Taylor + Dad', transport:'\u2708\uFE0F Flew from Cleveland',
-    notes:'May 2026. Astros vs White Sox \u2014 3 games.' },
-  { name:'Wrigley Field', city:'Chicago, IL', lat:41.9484, lng:-87.6553, trip:'2026-final', q:28,
+    notes:'May 2025. Astros vs White Sox \u2014 3 games.' },
+  { name:'Wrigley Field', city:'Chicago, IL', lat:41.9484, lng:-87.6553, trip:'2025-final', q:28,
     flags:'final', who:'Taylor + Dad',
-    notes:'May 2026. Cubs vs Giants. \u2B50 THE FINAL MLB STADIUM. The quest is complete. Father and son. What a ride.' },
+    notes:'May 2025. Cubs vs Giants. \u2B50 THE FINAL MLB STADIUM. The quest is complete. Father and son. What a ride.' },
   { name:'Minute Maid Park (WBC 2026)', city:'Houston, TX', lat:29.7578, lng:-95.3548, trip:'2026-wbc',
     flags:'', who:'Taylor + Dad + Mom',
     notes:'2026 World Baseball Classic Super Round. 6 games at Minute Maid Park, Mar 9\u201315, 2026. Opened with USA vs Mexico on Mar 9. Final game attended: Puerto Rico vs Italy (~Mar 15). Taylor flew in from Denver; Mom and Dad were already home in Houston. All three in Team USA jerseys.' },
@@ -757,7 +757,7 @@ var ROUTES = [
     { from:HOU, to:DEN, mode:'flight', label:'Taylor home' },
   ]},
   // 2026 FINAL — Dad from Houston, Taylor from Denver, both to Cleveland, flew CLE->CHI, drove to Wrigley, flew home
-  { trip:'2026-final', segments:[
+  { trip:'2025-final', segments:[
     { from:HOU, to:[41.4962,-81.6852], mode:'flight', label:'Dad' },
     { from:DEN, to:[41.4962,-81.6852], mode:'flight', label:'Taylor' },
     { from:[41.4962,-81.6852], to:[41.8299,-87.6338], mode:'flight' },
@@ -1471,7 +1471,7 @@ document.getElementById('transport-filters').addEventListener('click', function(
 // ===================== MOBILE FEED =====================
 
 var MOBILE_TRIP_ORDER = [
-  '2026-final', '2026-wbc', '2024-det', '2023-mil', '2022-ne',
+  '2026-wbc', '2025-final', '2024-det', '2023-mil', '2022-ne',
   '2019-ws', '2019-kc', '2019-fla', '2019-tex', '2018-west',
   '2017', '2016-sea', '2015-min', '2015-bos', '2015-tor',
   '2014-ana', '2011-az', '2008-nyc', '2006-az', '1999-bal',
@@ -1561,28 +1561,11 @@ function buildMobileCards() {
     for (var i = 0; i < tripStadiums.length; i++) {
       if ((tripStadiums[i].flags || '').indexOf('final') !== -1) { targetStadium = tripStadiums[i]; break; }
     }
-    (function(stadium, tStadiums) {
+    (function(stadium) {
       card.addEventListener('click', function() {
-        var main = document.getElementById('main');
-        if (!main.classList.contains('map-visible')) {
-          main.classList.add('map-visible');
-          document.getElementById('mobile-map-btn').innerHTML = '&#127758; Hide Map &#9650;';
-          setTimeout(function() { map.invalidateSize(); }, 350);
-        }
-        highlightedTrip = null;
-        renderAll();
-        var bounds = tStadiums.map(function(s) { return [s.lat, s.lng]; });
-        if (bounds.length === 1) {
-          map.setView(bounds[0], 12);
-        } else {
-          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
-        }
-        setTimeout(function() {
-          showInfoCard(stadium);
-          document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        showInfoCard(stadium);
       });
-    })(targetStadium, tripStadiums);
+    })(targetStadium);
 
     feed.appendChild(card);
   });
