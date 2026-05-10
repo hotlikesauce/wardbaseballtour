@@ -766,5 +766,21 @@
     "date": null,
     "lat": null,
     "lng": null
+  },
+  {
+    "file": "photos/20260313_190242.jpg",
+    "stadium": "Minute Maid Park (WBC 2026)",
+    "trip": "2026-wbc",
+    "date": "2026-03-13",
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/IMG_20260313_210242 (1).jpg",
+    "stadium": "Minute Maid Park (WBC 2026)",
+    "trip": "2026-wbc",
+    "date": "2026-03-13",
+    "lat": null,
+    "lng": null
   }
 ]

@@ -256,12 +256,104 @@ body { font-family: 'Georgia', serif; background: #0a0a0a; color: #f0e6d3; heigh
 }
 @keyframes pulse-text { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-/* Responsive */
+/* ===================== MOBILE ===================== */
+#mobile-map-btn { display: none; }
+#mobile-feed { display: none; }
+
 @media (max-width: 768px) {
-  #sidebar { width: 100%; max-height: 40vh; }
-  #main { flex-direction: column; }
-  #stats { gap: 10px; }
-  .stat-num { font-size: 1rem; }
+  body { height: auto; overflow-y: auto; overflow-x: hidden; }
+
+  #header { padding: 8px 12px; }
+  #header h1 { font-size: 1rem; }
+  .subtitle { display: none; }
+  #stats { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .stat-num { font-size: 0.88rem; }
+  .stat-label { font-size: 0.5rem; }
+  #stats .stat:nth-child(n+6) { display: none; }
+
+  #mobile-map-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: #161616; border: none; border-bottom: 1px solid #2a2a2a;
+    color: #888; font-size: 0.76rem; font-family: Georgia, serif;
+    padding: 8px 14px; width: 100%; cursor: pointer; text-align: left;
+  }
+  #mobile-map-btn:active { background: #1e1e1e; }
+
+  #main {
+    height: 0; min-height: 0; overflow: hidden;
+    flex-direction: row; transition: height 0.3s ease;
+  }
+  #main.map-visible { height: 280px; }
+  #sidebar { display: none; }
+  #map { flex: 1; height: 100%; }
+
+  #info-card {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    width: 100%; max-width: 100%;
+    border-radius: 16px 16px 0 0; max-height: 82vh;
+    border: none; border-top: 2px solid #444;
+  }
+
+  #mobile-feed { display: block; padding: 12px 12px 32px; }
+
+  .mcard {
+    background: #111; border: 1px solid #2a2a2a;
+    border-radius: 12px; margin-bottom: 16px;
+    overflow: hidden; cursor: pointer; transition: transform 0.12s;
+  }
+  .mcard:active { transform: scale(0.985); }
+
+  .mcard-hero {
+    width: 100%; aspect-ratio: 16 / 9;
+    background-size: cover; background-position: center;
+    position: relative; background-color: #1a1a1a;
+  }
+  .mcard-hero-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.88));
+    padding: 28px 12px 10px;
+  }
+  .mcard-hero-title { font-size: 0.95rem; font-weight: bold; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
+  .mcard-hero-sub { font-size: 0.7rem; color: #ccc; margin-top: 2px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+
+  .mcard-header {
+    padding: 12px 14px 10px;
+    border-left: 4px solid var(--trip-color, #EB6123);
+    background: #161616;
+  }
+  .mcard-header-title { font-size: 0.95rem; font-weight: bold; color: #fff; }
+  .mcard-header-sub { font-size: 0.7rem; color: #999; margin-top: 2px; }
+
+  .mcard-meta { padding: 7px 12px 4px; font-size: 0.72rem; color: #999; }
+
+  .mcard-stadiums { padding: 4px 12px 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .mcard-chip {
+    display: inline-block; background: #1c1c1c; border: 1px solid #333;
+    border-radius: 8px; padding: 2px 8px; font-size: 0.67rem; color: #bbb;
+  }
+
+  .mcard-photostrip {
+    display: flex; gap: 4px; overflow-x: auto;
+    padding: 0 12px 10px; scrollbar-width: none;
+  }
+  .mcard-photostrip::-webkit-scrollbar { display: none; }
+  .mcard-photostrip img {
+    height: 90px; min-width: 70px; width: auto;
+    border-radius: 5px; object-fit: cover; flex-shrink: 0;
+    border: 1px solid #2a2a2a;
+  }
+
+  .mcard-notes {
+    font-size: 0.72rem; color: #777; padding: 6px 12px 12px;
+    border-top: 1px solid #1e1e1e; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical; overflow: hidden;
+  }
+
+  .splash-content h1 { font-size: 1.9rem; letter-spacing: 1px; }
+  .splash-content .splash-stat { font-size: 1.15rem; }
+  .splash-content .splash-sub { font-size: 0.9rem; }
+  .splash-content .splash-tagline { font-size: 0.78rem; }
 }
 </style>
 </head>
@@ -295,6 +387,8 @@ body { font-family: 'Georgia', serif; background: #0a0a0a; color: #f0e6d3; heigh
     <div class="stat"><div class="stat-num">2</div><div class="stat-label">WS Rings</div></div>
   </div>
 </div>
+
+<button id="mobile-map-btn">&#127758; Show Map &#9660;</button>
 
 <div id="main">
   <div id="sidebar">
@@ -338,6 +432,8 @@ body { font-family: 'Georgia', serif; background: #0a0a0a; color: #f0e6d3; heigh
     <div class="lb-counter"></div>
   </div>
 </div>
+
+<div id="mobile-feed"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -427,6 +523,8 @@ var TRIPS = [
     desc:'Comerica Park. Only stadium on trip.' },
   { id:'2026-final', name:'\u2B50 May 2026 \u2014 THE FINAL QUEST', color:'#00BCD4', who:'Taylor + Dad', cat:'dad', transport:['flight','drive'], year:'May 2026',
     desc:'Cleveland \u2192 flew to Chicago. White Sox (3g) then WRIGLEY \u2014 THE FINAL MLB STADIUM!' },
+  { id:'2026-wbc', name:'Mar 2026 \u2014 World Baseball Classic', color:'#BF0D3E', who:'Taylor + Dad + Mom', cat:'family', transport:['flight'], year:'Mar 2026',
+    desc:'6 WBC Super Round games at Minute Maid Park in Houston, Mar 9\u201315, 2026. Opened with USA vs Mexico on Mar 9. Closed with Puerto Rico vs Italy. Taylor flew in from Denver; Mom and Dad were home. All three in Team USA jerseys.' },
 ];
 
 var STADIUMS = [
@@ -531,6 +629,9 @@ var STADIUMS = [
   { name:'Wrigley Field', city:'Chicago, IL', lat:41.9484, lng:-87.6553, trip:'2026-final', q:28,
     flags:'final', who:'Taylor + Dad',
     notes:'May 2026. Cubs vs Giants. \u2B50 THE FINAL MLB STADIUM. The quest is complete. Father and son. What a ride.' },
+  { name:'Minute Maid Park (WBC 2026)', city:'Houston, TX', lat:29.7578, lng:-95.3548, trip:'2026-wbc',
+    flags:'', who:'Taylor + Dad + Mom',
+    notes:'2026 World Baseball Classic Super Round. 6 games at Minute Maid Park, Mar 9\u201315, 2026. Opened with USA vs Mexico on Mar 9. Final game attended: Puerto Rico vs Italy (~Mar 15). Taylor flew in from Denver; Mom and Dad were already home in Houston. All three in Team USA jerseys.' },
 ];
 
 // Route segments: each segment has origin, destination, and mode (flight/drive/train)
@@ -649,6 +750,11 @@ var ROUTES = [
     { from:DEN, to:[42.3390,-83.0485], mode:'flight', label:'Taylor' },
     { from:[42.3390,-83.0485], to:HOU, mode:'flight', label:'Dad home' },
     { from:[42.3390,-83.0485], to:DEN, mode:'flight', label:'Taylor home' },
+  ]},
+  // 2026 WBC — Taylor flew from Denver to Houston; Dad and Mom were home
+  { trip:'2026-wbc', segments:[
+    { from:DEN, to:HOU, mode:'flight', label:'Taylor' },
+    { from:HOU, to:DEN, mode:'flight', label:'Taylor home' },
   ]},
   // 2026 FINAL — Dad from Houston, Taylor from Denver, both to Cleveland, flew CLE->CHI, drove to Wrigley, flew home
   { trip:'2026-final', segments:[
@@ -845,8 +951,10 @@ fetch('photos.json').then(function(r) { return r.json(); }).then(function(data) 
     photosByStadium[p.stadium].push(p);
   });
   console.log('Loaded ' + data.length + ' photos for ' + Object.keys(photosByStadium).length + ' stadiums');
+  buildMobileCards();
 }).catch(function(e) {
   console.log('No photos.json found (run scan_photos.py to generate)');
+  buildMobileCards();
 });
 
 // ===================== HIGHLIGHTS =====================
@@ -1359,6 +1467,129 @@ document.getElementById('transport-filters').addEventListener('click', function(
     }
   });
 })();
+
+// ===================== MOBILE FEED =====================
+
+var MOBILE_TRIP_ORDER = [
+  '2026-final', '2026-wbc', '2024-det', '2023-mil', '2022-ne',
+  '2019-ws', '2019-kc', '2019-fla', '2019-tex', '2018-west',
+  '2017', '2016-sea', '2015-min', '2015-bos', '2015-tor',
+  '2014-ana', '2011-az', '2008-nyc', '2006-az', '1999-bal',
+  '1992-sd', 'coors', 'home'
+];
+
+function isMobile() { return window.innerWidth <= 768; }
+
+function toggleMobileMap() {
+  var main = document.getElementById('main');
+  var btn = document.getElementById('mobile-map-btn');
+  if (main.classList.contains('map-visible')) {
+    main.classList.remove('map-visible');
+    btn.innerHTML = '&#127758; Show Map &#9660;';
+  } else {
+    main.classList.add('map-visible');
+    btn.innerHTML = '&#127758; Hide Map &#9650;';
+    setTimeout(function() { map.invalidateSize(); }, 350);
+  }
+}
+
+function buildMobileCards() {
+  if (!isMobile()) return;
+  var feed = document.getElementById('mobile-feed');
+  if (!feed) return;
+  feed.innerHTML = '';
+
+  MOBILE_TRIP_ORDER.forEach(function(tripId) {
+    var trip = tripMap[tripId];
+    if (!trip) return;
+
+    var tripStadiums = STADIUMS.filter(function(s) { return s.trip === tripId; });
+    if (tripStadiums.length === 0) return;
+
+    var tripPhotos = photoData.filter(function(p) { return p.trip === tripId; });
+
+    var card = document.createElement('div');
+    card.className = 'mcard';
+    card.style.setProperty('--trip-color', trip.color);
+
+    // Hero
+    var headerHtml;
+    if (tripPhotos.length > 0) {
+      headerHtml = '<div class="mcard-hero" style="background-image:url(\'' + tripPhotos[0].file.replace(/'/g, "\\'") + '\')">' +
+        '<div class="mcard-hero-overlay">' +
+          '<div class="mcard-hero-title">' + trip.name + '</div>' +
+          '<div class="mcard-hero-sub">' + trip.year + (tripPhotos.length > 1 ? ' · ' + tripPhotos.length + ' photos' : '') + '</div>' +
+        '</div></div>';
+    } else {
+      headerHtml = '<div class="mcard-header">' +
+        '<div class="mcard-header-title">' + trip.name + '</div>' +
+        '<div class="mcard-header-sub">' + trip.year + '</div>' +
+      '</div>';
+    }
+
+    // Transport icons
+    var transportIcons = (trip.transport || []).map(function(t) {
+      return t === 'flight' ? '✈️' : t === 'drive' ? '🚗' : '🚂';
+    }).join(' ');
+
+    var miles = tripMiles[tripId];
+    var metaHtml = '<div class="mcard-meta">' +
+      '👥 ' + trip.who +
+      (transportIcons ? ' &middot; ' + transportIcons : '') +
+      (miles ? ' &middot; <span style="color:#EB6123">' + miles.toLocaleString() + ' mi</span>' : '') +
+    '</div>';
+
+    var chipsHtml = '<div class="mcard-stadiums">' +
+      tripStadiums.map(function(s) { return '<span class="mcard-chip">' + s.name + '</span>'; }).join('') +
+    '</div>';
+
+    var stripHtml = '';
+    if (tripPhotos.length > 1) {
+      stripHtml = '<div class="mcard-photostrip">';
+      tripPhotos.slice(1).forEach(function(p) {
+        stripHtml += '<img src="' + p.file + '" loading="lazy" alt="">';
+      });
+      stripHtml += '</div>';
+    }
+
+    var notesHtml = trip.desc ? '<div class="mcard-notes">' + trip.desc + '</div>' : '';
+
+    card.innerHTML = headerHtml + metaHtml + chipsHtml + stripHtml + notesHtml;
+
+    // Click: zoom map to trip and show info card
+    var targetStadium = tripStadiums[0];
+    for (var i = 0; i < tripStadiums.length; i++) {
+      if ((tripStadiums[i].flags || '').indexOf('final') !== -1) { targetStadium = tripStadiums[i]; break; }
+    }
+    (function(stadium, tStadiums) {
+      card.addEventListener('click', function() {
+        var main = document.getElementById('main');
+        if (!main.classList.contains('map-visible')) {
+          main.classList.add('map-visible');
+          document.getElementById('mobile-map-btn').innerHTML = '&#127758; Hide Map &#9650;';
+          setTimeout(function() { map.invalidateSize(); }, 350);
+        }
+        highlightedTrip = null;
+        renderAll();
+        var bounds = tStadiums.map(function(s) { return [s.lat, s.lng]; });
+        if (bounds.length === 1) {
+          map.setView(bounds[0], 12);
+        } else {
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 12 });
+        }
+        setTimeout(function() {
+          showInfoCard(stadium);
+          document.getElementById('main').scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      });
+    })(targetStadium, tripStadiums);
+
+    feed.appendChild(card);
+  });
+}
+
+document.getElementById('mobile-map-btn').addEventListener('click', toggleMobileMap);
+buildMobileCards();
 
 </script>
 </body>
