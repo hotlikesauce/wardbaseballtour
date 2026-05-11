@@ -294,14 +294,25 @@ body { font-family: 'Georgia', serif; background: #0a0a0a; color: #f0e6d3; heigh
     border-radius: 0; border: none;
     z-index: 1500;
     display: block !important;
-    transform: translateY(100%);
-    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+    overflow-y: scroll;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    opacity: 0;
+    pointer-events: none;
+    transform: none;
+    transition: opacity 0.18s ease;
   }
-  #info-card.visible { transform: translateY(0); }
+  #info-card.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
   #info-close {
-    width: 40px; height: 40px; font-size: 1.4rem;
+    width: 44px; height: 44px; font-size: 1.4rem;
     top: 10px; right: 12px;
-    background: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.14);
+  }
+  .photo-strip, .highlight-strip {
+    touch-action: pan-x;
   }
 
   #mobile-feed { display: block; padding: 12px 12px 32px; }
@@ -1127,8 +1138,8 @@ function showInfoCard(s) {
     }
   }
 
-  // Order: info → highlights → photos (highlights before photo strip so they're reachable)
-  infoContent.innerHTML += hlHtml + stripHtml + '</div>';
+  // Photos first, then highlights
+  infoContent.innerHTML += stripHtml + hlHtml + '</div>';
 
   // Attach click handlers to hero + strip photos
   if (photos.length > 0) {
@@ -1566,10 +1577,17 @@ function buildMobileCards() {
 
     card.innerHTML = headerHtml + metaHtml + chipsHtml + stripHtml + notesHtml;
 
-    // Click: zoom map to trip and show info card
+    // Pick best stadium: prefer 'final', then most photos, then first
     var targetStadium = tripStadiums[0];
     for (var i = 0; i < tripStadiums.length; i++) {
       if ((tripStadiums[i].flags || '').indexOf('final') !== -1) { targetStadium = tripStadiums[i]; break; }
+    }
+    if (targetStadium === tripStadiums[0] && tripStadiums.length > 1) {
+      var bestCount = (photosByStadium[tripStadiums[0].name] || []).length;
+      for (var j = 1; j < tripStadiums.length; j++) {
+        var c = (photosByStadium[tripStadiums[j].name] || []).length;
+        if (c > bestCount) { bestCount = c; targetStadium = tripStadiums[j]; }
+      }
     }
     (function(stadium) {
       card.addEventListener('click', function() {
