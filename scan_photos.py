@@ -35,6 +35,7 @@ STADIUMS = [
     {"name": "Camden Yards", "lat": 39.2838, "lng": -76.6215, "trip": "1999-bal"},
     {"name": "Chase Field", "lat": 33.4453, "lng": -112.0667, "trip": "2006-az"},
     {"name": "Yankee Stadium (Old)", "lat": 40.8296, "lng": -73.9272, "trip": "2008-nyc"},
+    {"name": "Yankee Stadium", "lat": 40.8296, "lng": -73.9261, "trip": "nyc-new"},
     {"name": "Globe Life Park", "lat": 32.7512, "lng": -97.0832, "trip": "2009-tex"},
     {"name": "Angel Stadium", "lat": 33.8003, "lng": -117.8827, "trip": "2014-ana"},
     {"name": "Turner Field", "lat": 33.7350, "lng": -84.3897, "trip": "2014-atl"},
@@ -77,7 +78,8 @@ TRIP_DATES = {
     "2014-atl": (datetime(2014, 1, 1), datetime(2014, 12, 31)),
     "solo-sd": None,  # multiple years
     "2015-tor": (datetime(2015, 6, 3), datetime(2015, 6, 9)),
-    "2015-min": (datetime(2015, 8, 26), datetime(2015, 9, 1)),
+    "nyc-new": (datetime(2015, 8, 24), datetime(2015, 8, 27)),
+    "2015-min": (datetime(2015, 8, 28), datetime(2015, 9, 1)),
     "2016-bos": (datetime(2016, 5, 10), datetime(2016, 5, 17)),
     "coors": None,  # ongoing
     "2016-sea": (datetime(2016, 1, 1), datetime(2016, 12, 31)),
@@ -105,7 +107,11 @@ MANUAL_OVERRIDES = {
     "IMG_2967.JPG":             {"stadium": "T-Mobile Park", "trip": "2016-sea", "date": None},
     "IMG_3101.JPG":             {"stadium": "Coors Field", "trip": "coors", "date": None},
     "IMG_4090.jpg":             {"stadium": "Busch Stadium", "trip": "2019-kc", "date": None},
-    "IMG_1652.JPG":             {"stadium": "Yankee Stadium (Old)", "trip": "2008-nyc", "date": "2008-08-15"},
+    # EXIF says 2015-08-26: Mom & Dad at the NEW Yankee Stadium, two days before Minneapolis
+    "IMG_1652.JPG":             {"stadium": "Yankee Stadium", "trip": "nyc-new", "date": "2015-08-26"},
+    # Shot from the Jersey waterfront on the 2022 NY/Philly trip — GPS put it inside
+    # old Yankee Stadium's 10-mile radius, which is wrong
+    "20220629_200429.jpg":      {"stadium": "Citi Field", "trip": "2022-ne", "date": "2022-06-29"},
     "IMG_7779.jpg":             {"stadium": "Minute Maid Park", "trip": "home", "date": None},
     "imagejpeg_0(10).jpg":      {"stadium": "Estadio Alfredo Harp Hel\u00fa", "trip": "2024-mex", "date": None},
     "IMG_0789.jpg":             {"stadium": "Citi Field", "trip": "2022-ne", "date": "2022-06-28"},
@@ -329,7 +335,7 @@ def scan():
 
     # Write output
     with open(OUTPUT, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+        json.dump(results, f, indent=2, ensure_ascii=True)
 
     print(f"\nWrote {OUTPUT}")
 

@@ -33,17 +33,65 @@
   },
   {
     "file": "photos/imagejpeg_0(10).jpg",
-    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "stadium": "Estadio Alfredo Harp Hel\u00fa",
     "trip": "2024-mex",
     "date": null,
     "lat": null,
     "lng": null
   },
   {
-    "file": "photos/IMG_1652.JPG",
-    "stadium": "Yankee Stadium (Old)",
-    "trip": "2008-nyc",
-    "date": "2008-08-15",
+    "file": "photos/IMG_1351.jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/San_Diego_1993.jpg",
+    "stadium": "Qualcomm Stadium",
+    "trip": "1992-sd",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348.jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348 (1).jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348 (2).jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083348 (3).jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
+    "lat": null,
+    "lng": null
+  },
+  {
+    "file": "photos/BOS_IMG_20260313_083349.jpg",
+    "stadium": "Fenway Park",
+    "trip": "2015-bos",
+    "date": null,
     "lat": null,
     "lng": null
   },
@@ -94,6 +142,14 @@
     "date": "2015-05-08",
     "lat": 39.7557,
     "lng": -104.9947
+  },
+  {
+    "file": "photos/IMG_1652.JPG",
+    "stadium": "Yankee Stadium",
+    "trip": "nyc-new",
+    "date": "2015-08-26",
+    "lat": null,
+    "lng": null
   },
   {
     "file": "photos/IMG_1667.JPG",
@@ -248,14 +304,6 @@
     "lng": -84.4679
   },
   {
-    "file": "photos/IMG_1351.jpg",
-    "stadium": "Fenway Park",
-    "trip": "2015-bos",
-    "date": null,
-    "lat": null,
-    "lng": null
-  },
-  {
     "file": "photos/IMG_1356.JPG",
     "stadium": "Truist Park",
     "trip": "2017",
@@ -288,6 +336,14 @@
     "lng": null
   },
   {
+    "file": "photos/20190328_155922.jpg",
+    "stadium": "Tropicana Field",
+    "trip": "2019-fla",
+    "date": "2019-03-28",
+    "lat": null,
+    "lng": null
+  },
+  {
     "file": "photos/20190329_102202.jpg",
     "stadium": "Tropicana Field",
     "trip": "2019-fla",
@@ -300,14 +356,6 @@
     "stadium": "Tropicana Field",
     "trip": "2019-fla",
     "date": "2019-03-29",
-    "lat": null,
-    "lng": null
-  },
-  {
-    "file": "photos/20190328_155922.jpg",
-    "stadium": "Tropicana Field",
-    "trip": "2019-fla",
-    "date": "2019-03-28",
     "lat": null,
     "lng": null
   },
@@ -417,8 +465,8 @@
   },
   {
     "file": "photos/20220629_200429.jpg",
-    "stadium": "Yankee Stadium (Old)",
-    "trip": "2008-nyc",
+    "stadium": "Citi Field",
+    "trip": "2022-ne",
     "date": "2022-06-29",
     "lat": 40.7654,
     "lng": -74.0372
@@ -497,7 +545,7 @@
   },
   {
     "file": "photos/20240427_142721.jpg",
-    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "stadium": "Estadio Alfredo Harp Hel\u00fa",
     "trip": "2024-mex",
     "date": "2024-04-27",
     "lat": 19.4045,
@@ -505,7 +553,7 @@
   },
   {
     "file": "photos/20240427_150526.jpg",
-    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "stadium": "Estadio Alfredo Harp Hel\u00fa",
     "trip": "2024-mex",
     "date": "2024-04-27",
     "lat": 19.4037,
@@ -513,7 +561,7 @@
   },
   {
     "file": "photos/20240428_132006.jpg",
-    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "stadium": "Estadio Alfredo Harp Hel\u00fa",
     "trip": "2024-mex",
     "date": "2024-04-28",
     "lat": 19.4039,
@@ -521,7 +569,7 @@
   },
   {
     "file": "photos/20240428_135350.jpg",
-    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "stadium": "Estadio Alfredo Harp Hel\u00fa",
     "trip": "2024-mex",
     "date": "2024-04-28",
     "lat": 19.4039,
@@ -529,7 +577,7 @@
   },
   {
     "file": "photos/20240428_150146.jpg",
-    "stadium": "Estadio Alfredo Harp Hel\u00c3\u00ba",
+    "stadium": "Estadio Alfredo Harp Hel\u00fa",
     "trip": "2024-mex",
     "date": "2024-04-28",
     "lat": 19.4039,
@@ -742,54 +790,6 @@
     "date": "2025-08-01",
     "lat": 39.7556,
     "lng": -104.9935
-  },
-  {
-    "file": "photos/San_Diego_1993.jpg",
-    "stadium": "Qualcomm Stadium",
-    "trip": "1992-sd",
-    "date": null,
-    "lat": null,
-    "lng": null
-  },
-  {
-    "file": "photos/BOS_IMG_20260313_083348.jpg",
-    "stadium": "Fenway Park",
-    "trip": "2015-bos",
-    "date": null,
-    "lat": null,
-    "lng": null
-  },
-  {
-    "file": "photos/BOS_IMG_20260313_083348 (1).jpg",
-    "stadium": "Fenway Park",
-    "trip": "2015-bos",
-    "date": null,
-    "lat": null,
-    "lng": null
-  },
-  {
-    "file": "photos/BOS_IMG_20260313_083348 (2).jpg",
-    "stadium": "Fenway Park",
-    "trip": "2015-bos",
-    "date": null,
-    "lat": null,
-    "lng": null
-  },
-  {
-    "file": "photos/BOS_IMG_20260313_083348 (3).jpg",
-    "stadium": "Fenway Park",
-    "trip": "2015-bos",
-    "date": null,
-    "lat": null,
-    "lng": null
-  },
-  {
-    "file": "photos/BOS_IMG_20260313_083349.jpg",
-    "stadium": "Fenway Park",
-    "trip": "2015-bos",
-    "date": null,
-    "lat": null,
-    "lng": null
   },
   {
     "file": "photos/IMG_20260313_210242 (1).jpg",
