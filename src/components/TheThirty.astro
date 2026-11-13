@@ -1,0 +1,115 @@
+---
+import { QUEST } from '../lib/journey';
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<section class="thirty" id="the-30">
+  <header class="section-head">
+    <h2>The thirty</h2>
+    <p>
+      One park per franchise, numbered in order of first visit. Minute Maid is No. 1 as the home park.
+    </p>
+  </header>
+
+  <ol class="grid">
+    {
+      QUEST.map(({ q, park, chapter, final }) => (
+        <li class:list={{ final, gone: !!park.status }}>
+          <a href={`#trip-${chapter.id}`} data-park={park.id}>
+            <span class="no">{pad(q)}</span>
+            <span class="abbr">{park.abbr}</span>
+            <span class="park">{park.name}</span>
+            <span class="year">
+              {chapter.kind === 'home' ? '2000' : chapter.year}
+              {park.status && (
+                <span class="dagger" title={park.status}>
+                  †
+                </span>
+              )}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="foot meta">† No longer home to that team: Qualcomm, old Yankee Stadium, Globe Life Park, Oakland Coliseum.</p>
+</section>
+
+<style>
+  .thirty { padding: clamp(3rem, 7vw, 5.5rem) var(--gutter) clamp(2.5rem, 6vw, 4.5rem); }
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 2px solid var(--rule-strong);
+    border-left: 1px solid var(--rule);
+  }
+  li { border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  a {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'no abbr' 'no year';
+    column-gap: 0.55rem;
+    align-items: center;
+    height: 100%;
+    padding: 10px 10px 9px;
+    text-decoration: none;
+    transition: background-color 0.12s;
+  }
+  a:hover { background: var(--paper-2); color: inherit; }
+  .no {
+    grid-area: no;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+  }
+  .abbr {
+    grid-area: abbr;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    line-height: 1;
+    letter-spacing: 0.03em;
+  }
+  .park { display: none; }
+  .year {
+    grid-area: year;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-2);
+  }
+  .dagger { margin-left: 2px; color: var(--orange-ink); }
+  .final a { background: var(--board); color: var(--board-ink); }
+  .final .no { color: var(--orange); }
+  .final .year { color: var(--board-dim); }
+  .final a:hover { background: var(--board-2); }
+  .foot { margin-top: 0.9rem; color: var(--ink-3); }
+
+  @media (min-width: 640px) {
+    .grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    a {
+      grid-template-columns: 1fr auto;
+      grid-template-areas: 'no abbr' 'park park' 'year year';
+      row-gap: 0.35rem;
+      padding: 12px 12px 11px;
+      align-items: start;
+    }
+    .no { font-size: 2.4rem; }
+    .abbr { justify-self: end; padding-top: 0.2rem; }
+    .park {
+      display: block;
+      grid-area: park;
+      font-size: 0.92rem;
+      line-height: 1.25;
+      min-height: 2.5em;
+    }
+  }
+  @media (min-width: 1180px) {
+    .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+</style>

@@ -1,0 +1,187 @@
+---
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Hero from '../components/Hero.astro';
+import Scoreboard from '../components/Scoreboard.astro';
+import TheThirty from '../components/TheThirty.astro';
+import Chapter from '../components/Chapter.astro';
+import October from '../components/October.astro';
+import Footer from '../components/Footer.astro';
+import Dialogs from '../components/Dialogs.astro';
+import { CHAPTERS } from '../lib/journey';
+
+const tripCount = CHAPTERS.filter((c) => c.kind !== 'home').length;
+---
+
+<Base
+  title="Ward Ballpark Tour"
+  description="James and Taylor Ward saw a home game for all 30 MLB teams, 1992 to 2025. Every trip, route, photo and box score."
+>
+  <div id="top"></div>
+  <Masthead />
+  <main>
+    <Hero />
+    <Scoreboard />
+    <TheThirty />
+
+    <section class="journey" id="journey" aria-label="Every trip, in order">
+      <div class="map-shell" data-state="idle">
+        <div id="map" class="map" role="region" aria-label="Map of the trips"></div>
+        <div class="hud" aria-live="polite">
+          <span class="hud-year">All</span>
+          <span class="hud-title">trips</span>
+          <span class="hud-count"></span>
+        </div>
+        <div class="map-actions">
+          <button type="button" class="map-btn" data-action="tour" aria-pressed="false">
+            <svg viewBox="0 0 12 12" aria-hidden="true"><path class="i-play" d="M3 1.8v8.4L10 6z" /><path class="i-stop" d="M2.5 2.5h7v7h-7z" /></svg>
+            <span class="label-play">Play all {tripCount}</span><span class="label-stop">Stop</span>
+          </button>
+          <button type="button" class="map-btn" data-action="replay">Replay trip</button>
+          <button type="button" class="map-btn" data-action="overview">All routes</button>
+        </div>
+        <p class="map-status meta">Loading map…</p>
+      </div>
+
+      <div class="story">
+        {CHAPTERS.map((c) => <Chapter chapter={c} />)}
+      </div>
+    </section>
+
+    <October />
+  </main>
+  <Footer />
+  <Dialogs />
+
+  <script>
+    import '../scripts/app';
+  </script>
+</Base>
+
+<style>
+  .journey {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 2px solid var(--rule-strong);
+  }
+
+  /* Phones: the map pins to the top and the trips scroll underneath it */
+  .map-shell {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--map-h);
+    background: #0b1218;
+    border-bottom: 1px solid var(--rule-strong);
+  }
+  .map { position: absolute; inset: 0; }
+  .story { padding: 0 var(--gutter); min-width: 0; }
+  .story :global(.chapter) { scroll-margin-top: calc(var(--map-h) + 4px); }
+
+  @media (min-width: 1024px) {
+    .journey {
+      grid-template-columns: minmax(440px, 1fr) minmax(0, 1.15fr);
+      grid-template-areas: 'story map';
+    }
+    .map-shell {
+      grid-area: map;
+      align-self: start;
+      height: 100svh;
+      border-bottom: 0;
+      border-left: 1px solid var(--rule-strong);
+    }
+    .story { grid-area: story; padding: 0 clamp(1.5rem, 3.5vw, 3.5rem) 0 var(--gutter); }
+    .story :global(.chapter) { scroll-margin-top: 0; }
+  }
+
+  /* ---------- map overlay ---------- */
+  .hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 0.6rem;
+    align-items: baseline;
+    max-width: calc(100% - 70px);
+    padding: 8px 12px 9px;
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+    pointer-events: none;
+  }
+  .hud-year {
+    grid-row: span 2;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.9rem;
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+  }
+  .hud-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hud-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-2); }
+
+  .map-actions {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: calc(100% - 100px);
+  }
+  .map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 36px;
+    padding: 0 0.75rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .map-btn:hover { background: var(--ink); color: var(--paper); }
+  .map-btn svg { width: 10px; height: 10px; fill: currentColor; }
+  .map-btn .i-stop,
+  .map-btn .label-stop { display: none; }
+  .map-btn[aria-pressed='true'] { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .map-btn[aria-pressed='true'] .i-play,
+  .map-btn[aria-pressed='true'] .label-play { display: none; }
+  .map-btn[aria-pressed='true'] .i-stop,
+  .map-btn[aria-pressed='true'] .label-stop { display: inline; }
+
+  .map-status {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #a9b2b8;
+    pointer-events: none;
+  }
+  .map-shell:not([data-state='idle']) .map-status { display: none; }
+  .map-shell[data-state='error'] .map-status { display: grid; }
+  .map-shell[data-state='idle'] .map-actions { visibility: hidden; }
+
+  @media (max-width: 1023px) {
+    .hud { padding: 6px 10px 7px; }
+    .hud-year { font-size: 1.5rem; }
+    .hud-title { font-size: 0.82rem; }
+    .map-btn { min-height: 32px; padding: 0 0.6rem; font-size: 0.7rem; }
+    .map-btn[data-action='overview'] { display: none; }
+  }
+</style>

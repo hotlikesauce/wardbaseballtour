@@ -7,6 +7,7 @@ Usage: python cache_routes.py
 """
 
 import json
+import os
 import time
 import urllib.request
 
@@ -82,7 +83,7 @@ def main():
         if i < total - 1:
             time.sleep(0.5)
 
-    output = "road_routes.json"
+    output = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "data", "road_routes.json")
     with open(output, "w") as f:
         json.dump(routes, f)
 

@@ -1,0 +1,100 @@
+/* Pins, tooltips and controls inside the MapLibre canvas */
+
+.pin {
+  /* no position here: MapLibre positions markers absolutely and moves them with transforms */
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.pin span {
+  display: grid;
+  place-items: center;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f3eee4;
+  box-shadow: 0 0 0 2px #0b1218, 0 1px 4px rgb(0 0 0 / 0.5);
+  font-size: 0;
+  color: transparent;
+  transition: width 0.2s, height 0.2s, background-color 0.2s, opacity 0.25s;
+}
+.pin.extra span {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px #f3eee4, 0 0 0 1.5px #0b1218;
+}
+.pin.final span { background: #ff7d33; }
+.pin:hover span { transform: scale(1.25); }
+
+/* parks in the active trip: numbered scoreboard tiles */
+.pin.is-on { z-index: 3; }
+.pin.is-on span {
+  width: 26px;
+  height: 28px;
+  border-radius: 0;
+  background: #1e3a2e;
+  box-shadow: 0 0 0 2px #0e1d17, 0 2px 8px rgb(0 0 0 / 0.55);
+  color: #f2efe6;
+  font: 700 15px/1 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
+}
+.pin.extra.is-on span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f3eee4;
+  box-shadow: 0 0 0 2px #0b1218, 0 0 0 4px #ff7d33;
+}
+.pin.final.is-on span { color: #ff7d33; }
+.pin.is-target span { box-shadow: 0 0 0 2px #0e1d17, 0 0 0 5px #ff7d33; }
+.pin.is-off span { opacity: 0.45; }
+
+/* zoomed in on a ballpark: get the pins off the field */
+.is-close .pin span { opacity: 0.25; }
+.is-close .pin:hover span { opacity: 1; }
+
+/* hover tooltip */
+.map-tip .maplibregl-popup-content {
+  display: grid;
+  gap: 2px;
+  padding: 7px 10px 8px;
+  border-radius: 0;
+  border: 1px solid #1b1d20;
+  background: #f3eee4;
+  color: #1b1d20;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.35);
+  font: 600 0.85rem/1.25 'Source Serif 4 Variable', Georgia, serif;
+  pointer-events: none;
+}
+.map-tip .maplibregl-popup-content span {
+  font: 400 0.7rem/1.3 'IBM Plex Mono', ui-monospace, monospace;
+  color: #4a4d52;
+}
+.map-tip .maplibregl-popup-tip { display: none; }
+
+/* controls: square, paper, ink */
+.maplibregl-ctrl-group {
+  border-radius: 2px !important;
+  border: 1px solid #1b1d20;
+  box-shadow: none !important;
+  background: #f3eee4 !important;
+}
+.maplibregl-ctrl-group button { width: 34px; height: 34px; }
+.maplibregl-ctrl-group button + button { border-top: 1px solid #d2c8b4 !important; }
+.maplibregl-ctrl-top-right { top: 0; right: 0; }
+.maplibregl-ctrl-attrib {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px;
+}
+.maplibregl-ctrl-attrib.maplibregl-compact { background: rgb(243 238 228 / 0.9); }
+.maplibregl-cooperative-gesture-screen {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.9rem;
+  background: rgb(11 18 24 / 0.55);
+}
+
+/* fullscreen on phones: the shell becomes the whole screen */
+.map-shell:fullscreen { height: 100dvh !important; }

@@ -9,6 +9,7 @@ Uses the free MLB Stats API (statsapi.mlb.com).
 """
 
 import json
+import os
 import time
 import urllib.request
 from datetime import datetime
@@ -33,7 +34,7 @@ GAMES = [
 
     # 2008 - Old Yankee Stadium
     {'stadium': 'Yankee Stadium (Old)', 'date': '2008-08-15', 'home': 'NYY', 'away': 'KC', 'trip': '2008-nyc',
-     'notes': 'Mariano Rivera blows save, Royals win 4-3'},
+     'notes': 'Tied in the 9th, Royals beat Mariano Rivera 4-3'},
 
     # 2015 - Toronto (swept)
     {'stadium': 'Rogers Centre', 'date': '2015-06-05', 'home': 'TOR', 'away': 'HOU', 'trip': '2015-tor',
@@ -259,7 +260,7 @@ def main():
 
         time.sleep(0.3)
 
-    output = 'highlights.json'
+    output = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'src', 'data', 'highlights.json')
     with open(output, 'w') as f:
         json.dump(results, f)
 

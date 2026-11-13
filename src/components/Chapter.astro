@@ -1,0 +1,281 @@
+---
+import { Image } from 'astro:assets';
+import type { Chapter } from '../lib/journey';
+import { lightboxSrc } from '../lib/images';
+import Linescore from './Linescore.astro';
+import Gallery from './Gallery.astro';
+
+interface Props {
+  chapter: Chapter;
+}
+const { chapter: c } = Astro.props;
+const cover = c.coverPhoto;
+const rest = c.photos.slice(cover ? 1 : 0);
+const coverBig = cover ? await lightboxSrc(cover) : null;
+
+const MODE_WORD = { flight: 'flew', drive: 'drove', train: 'train' } as const;
+const travel = c.modes.map((m) => MODE_WORD[m]).join(', ');
+const metaLine = [c.who, travel, c.miles ? `${c.miles.toLocaleString('en-US')} mi` : null].filter(Boolean).join(' · ');
+const qs = c.stops.map((s) => s.visit.q).filter((q): q is number => !!q);
+const yearLabel = c.kind === 'home' ? 'Home' : String(c.year);
+// portrait covers get a narrower frame so they don't run three screens tall
+const coverTall = cover ? cover.ratio < 0.95 : false;
+// tall covers render at most ~26rem wide, so they never need more than 960px
+const coverMax = cover ? Math.min(cover.img.width, coverTall ? 960 : 1800) : 0;
+---
+
+<article
+  class:list={['chapter', `kind-${c.kind}`]}
+  id={`trip-${c.id}`}
+  data-trip={c.id}
+  aria-labelledby={`h-${c.id}`}
+>
+  <header class="head">
+    <p class="when">
+      <span class="year">{yearLabel}</span>
+      <span class="meta date">{c.when}</span>
+    </p>
+    <h2 id={`h-${c.id}`}>{c.title}</h2>
+    <p class="meta line">{metaLine}</p>
+    {
+      c.kind === 'bonus' && (
+        <p class="flag meta">Not part of the 30</p>
+      )
+    }
+    {
+      c.kind === 'epilogue' && (
+        <p class="flag meta">Not part of the 30</p>
+      )
+    }
+    {
+      qs.length > 0 && c.kind === 'quest' && (
+        <p class="flag meta">
+          {qs.length === 1 ? `Park No. ${qs[0]}` : `Parks No. ${qs.join(', ')}`}
+        </p>
+      )
+    }
+  </header>
+
+  {
+    cover && coverBig && (
+      <figure class:list={['cover', { tall: coverTall }]}>
+        <a href={coverBig} data-lightbox={c.id} data-index="0" data-caption={cover.caption ?? cover.alt}>
+          <Image
+            src={cover.img}
+            alt={cover.alt}
+            widths={[400, 640, 960, 1280, 1600].filter((w) => w < coverMax).concat(coverMax)}
+            width={coverMax}
+            height={Math.round(coverMax / cover.ratio)}
+            sizes={coverTall ? '(min-width: 1024px) 30vw, 80vw' : '(min-width: 1024px) 44vw, 100vw'}
+            loading="lazy"
+            decoding="async"
+            quality={75}
+            style={c.coverPosition ? `object-position:${c.coverPosition}` : undefined}
+          />
+        </a>
+        {cover.caption && <figcaption class="meta">{cover.caption}</figcaption>}
+      </figure>
+    )
+  }
+
+  {c.summary && <p class="summary">{c.summary}</p>}
+
+  {
+    c.quote && (
+      <blockquote>
+        <p>“{c.quote.text}”</p>
+        <footer class="meta">{c.quote.cite}</footer>
+      </blockquote>
+    )
+  }
+
+  <ol class="stops">
+    {
+      c.stops.map(({ visit, park, games }) => (
+        <li class:list={['stop', { final: visit.final }]} data-park={park.id}>
+          <div class="stop-head">
+            <span class:list={['qno', { none: !visit.q }]} aria-label={visit.q ? `Park number ${visit.q}` : 'Not numbered'}>
+              {visit.q ?? '–'}
+            </span>
+            <div class="stop-name">
+              <h3>{park.name}</h3>
+              <p class="meta">
+                {[park.team, park.city, visit.how].filter(Boolean).join(' · ')}
+                {park.status && <span class="status"> · {park.status}</span>}
+              </p>
+            </div>
+            <button type="button" class="fly" data-fly={park.id} aria-label={`Show ${park.name} from above`}>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 1.5 14.5 8 8 14.5 1.5 8Z" fill="none" stroke="currentColor" stroke-width="1.3" />
+                <circle cx="8" cy="8" r="1.6" fill="currentColor" />
+              </svg>
+              <span>Aerial</span>
+            </button>
+          </div>
+          <p class="notes">{visit.notes}</p>
+          {games.length > 0 && (
+            <div class="games">
+              {games.map((g) => (
+                <Linescore game={g} />
+              ))}
+            </div>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+
+  {rest.length > 0 && <Gallery photos={rest} set={c.id} start={1} />}
+</article>
+
+<style>
+  .chapter {
+    padding: clamp(2.75rem, 6vw, 4.5rem) 0 clamp(2.5rem, 5vw, 3.5rem);
+    border-top: 1px solid var(--rule);
+  }
+  .chapter:first-child { border-top: 0; }
+
+  .when {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .year {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3.4rem, 9vw, 5rem);
+    line-height: 0.85;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    transition: color 0.3s;
+  }
+  .chapter.is-active .year { color: var(--orange-ink); }
+  .date { color: var(--ink-2); }
+  h2 {
+    margin-top: 0.5rem;
+    font-size: clamp(1.6rem, 3.6vw, 2.15rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .line { margin-top: 0.5rem; }
+  .flag {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 2px 8px;
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    font-size: 0.72rem;
+  }
+  .kind-bonus .flag { border-style: dashed; color: var(--ink-2); border-color: var(--ink-3); }
+
+  .cover { margin: 1.5rem 0 0; }
+  .cover a { display: block; cursor: zoom-in; background: var(--paper-3); }
+  .cover img {
+    width: 100%;
+    max-height: min(70svh, 680px);
+    object-fit: cover;
+  }
+  .cover.tall a { width: min(100%, 26rem); }
+  .cover.tall img { max-height: min(78svh, 620px); }
+  .cover figcaption { margin-top: 0.5rem; color: var(--ink-3); }
+
+  .summary {
+    margin-top: 1.4rem;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    max-width: var(--measure);
+  }
+
+  blockquote {
+    margin: 1.75rem 0 0;
+    padding: 0 0 0 1.1rem;
+    border-left: 3px solid var(--orange);
+    max-width: var(--measure);
+  }
+  blockquote p {
+    font-style: italic;
+    font-size: 1.3rem;
+    line-height: 1.45;
+  }
+  blockquote footer { margin-top: 0.6rem; color: var(--ink-3); }
+
+  .stops {
+    list-style: none;
+    margin: 1.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1.6rem;
+  }
+  .stop {
+    padding-top: 1.1rem;
+    border-top: 2px solid var(--rule-strong);
+    scroll-margin-top: calc(var(--map-h) + 4px); /* land below the pinned map on phones */
+  }
+  @media (min-width: 1024px) {
+    .stop { scroll-margin-top: 1rem; }
+  }
+  .stop-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.85rem;
+    align-items: start;
+  }
+  .qno {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.9rem;
+    background: var(--board);
+    color: var(--board-ink);
+    border: 3px solid var(--board-edge);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.55rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .qno.none {
+    background: transparent;
+    color: var(--ink-3);
+    border: 1px dashed var(--ink-3);
+    font-size: 1.1rem;
+  }
+  .stop.final .qno { color: var(--orange); }
+  h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.2; }
+  .stop-name .meta { margin-top: 0.2rem; }
+  .status { color: var(--orange-ink); }
+  .fly {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 36px;
+    padding: 0 0.65rem;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .fly:hover { border-color: var(--ink); color: var(--ink); }
+  .fly svg { width: 13px; height: 13px; }
+  .notes { margin-top: 0.85rem; max-width: var(--measure); }
+  .stop.flash { animation: flash 1.6s ease-out; }
+  @keyframes flash {
+    0%, 30% { background: color-mix(in srgb, var(--orange) 16%, transparent); }
+    100% { background: transparent; }
+  }
+  .games {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 1.1rem;
+  }
+
+  .chapter :global(.gallery) { margin-top: 1.75rem; }
+
+  /* the thin chapters (no photos, one park) shouldn't take a full screen each */
+  .kind-bonus .year,
+  .kind-epilogue .year { font-size: clamp(2.6rem, 7vw, 3.6rem); }
+</style>

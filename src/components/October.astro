@@ -1,0 +1,125 @@
+---
+import { getOctober } from '../lib/journey';
+import Linescore from './Linescore.astro';
+
+const games = getOctober();
+const wins = games.filter(({ game }) => game.home.r > game.away.r).length;
+const seasons = [...new Set(games.map((g) => g.season))].map((season) => ({
+  season,
+  games: games.filter((g) => g.season === season),
+}));
+---
+
+<section class="october" id="october">
+  <header class="section-head">
+    <h2>October at home</h2>
+    <p>
+      {games.length} Astros playoff games at Minute Maid Park, {seasons[0].season}–{seasons.at(-1)!.season}. The Astros
+      went {wins}–{games.length - wins} in them, including the night they won the 2022 World Series. Tap a game for the
+      line score.
+    </p>
+  </header>
+
+  <ol class="seasons">
+    {
+      seasons.map(({ season, games }) => (
+        <li class="season">
+          <h3>{season}</h3>
+          <ol class="games">
+            {games.map(({ round, num, game }) => {
+              const won = game.home.r > game.away.r;
+              const extra = game.home.innings.length > 9 ? ` (${game.home.innings.length})` : '';
+              return (
+                <li>
+                  <details>
+                    <summary>
+                      <span class="rd meta">
+                        {round} {num}
+                      </span>
+                      <span class:list={['res', won ? 'w' : 'l']}>{won ? 'W' : 'L'}</span>
+                      <span class="score">
+                        {won ? `${game.home.r}–${game.away.r}` : `${game.away.r}–${game.home.r}`}
+                        <span class="opp"> vs {game.away.name}</span>
+                        {extra && <span class="extra meta">{extra}</span>}
+                      </span>
+                      {game.note && <span class="note">{game.note}</span>}
+                    </summary>
+                    <div class="box">
+                      <Linescore game={game} bare />
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+          </ol>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .october {
+    padding: clamp(3.5rem, 8vw, 6rem) var(--gutter) clamp(3rem, 6vw, 4.5rem);
+    border-top: 2px solid var(--rule-strong);
+  }
+  .seasons {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 62rem;
+    border-top: 1px solid var(--rule);
+  }
+  .season {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr;
+    gap: 0.75rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.9rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .games { list-style: none; margin: 0; padding: 0; }
+  summary {
+    display: grid;
+    grid-template-columns: 6.6rem 1.6rem 1fr;
+    align-items: baseline;
+    gap: 0.2rem 0.5rem;
+    padding: 0.35rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover .score { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  .rd { color: var(--ink-2); white-space: nowrap; }
+  .res {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .res.w { color: var(--win); }
+  .res.l { color: var(--orange-ink); }
+  .score { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .opp { font-weight: 400; }
+  .extra { color: var(--ink-3); }
+  .note {
+    grid-column: 3;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--ink-2);
+  }
+  .box { padding: 0.4rem 0 0.9rem; max-width: 40rem; }
+  details[open] summary .score { color: var(--orange-ink); }
+
+  @media (max-width: 479px) {
+    .season { grid-template-columns: 1fr; gap: 0.35rem; }
+    summary { grid-template-columns: 5.9rem 1.3rem 1fr; }
+    .note { grid-column: 1 / -1; }
+  }
+</style>

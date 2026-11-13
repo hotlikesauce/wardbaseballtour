@@ -1,0 +1,171 @@
+---
+const close = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>';
+---
+
+<dialog id="lightbox" class="lightbox" aria-label="Photo viewer">
+  <div class="lb-track" tabindex="-1"></div>
+  <div class="lb-bar">
+    <p class="lb-caption"></p>
+    <p class="lb-count"></p>
+  </div>
+  <button type="button" class="lb-btn lb-close" data-close aria-label="Close photos" set:html={close} />
+  <button type="button" class="lb-btn lb-prev" aria-label="Previous photo">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" fill="none" /></svg>
+  </button>
+  <button type="button" class="lb-btn lb-next" aria-label="Next photo">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.6" fill="none" /></svg>
+  </button>
+</dialog>
+
+<dialog id="clips" class="clips" aria-labelledby="clips-title">
+  <div class="cl-head">
+    <h2 id="clips-title"></h2>
+    <button type="button" class="lb-btn cl-close" data-close aria-label="Close highlights" set:html={close} />
+  </div>
+  <div class="cl-stage">
+    <video controls playsinline preload="none"></video>
+  </div>
+  <p class="cl-desc"></p>
+  <ol class="cl-list"></ol>
+  <p class="cl-credit">Video © MLB</p>
+</dialog>
+
+<style is:global>
+  /* ---------- photo lightbox ---------- */
+  .lightbox {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #0c0d0e;
+    color: #ece7dc;
+    overscroll-behavior: contain;
+  }
+  .lightbox::backdrop { background: #0c0d0e; }
+  .lightbox[open] { display: grid; grid-template-rows: 1fr auto; }
+  .lb-track {
+    min-height: 0; /* let the 1fr row cap it, so tall photos fit instead of overflowing */
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pinch-zoom;
+    outline: none;
+  }
+  .lb-track::-webkit-scrollbar { display: none; }
+  .lb-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 56px 12px 8px;
+    height: 100%;
+    min-height: 0;
+  }
+  .lb-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .lb-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+  .lb-caption { color: #ece7dc; }
+  .lb-count { color: #9a958c; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .lb-btn {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    border-radius: 2px;
+    background: rgb(12 13 14 / 0.6);
+    color: #ece7dc;
+    cursor: pointer;
+  }
+  .lb-btn:hover { background: #ece7dc; color: #0c0d0e; }
+  .lb-btn svg { width: 16px; height: 16px; }
+  .lb-close { top: 8px; right: 8px; }
+  .lb-prev, .lb-next { top: 50%; transform: translateY(-50%); }
+  .lb-prev { left: 12px; }
+  .lb-next { right: 12px; }
+  @media (hover: none) {
+    .lb-prev, .lb-next { display: none; } /* swipe instead */
+  }
+
+  /* ---------- highlight clips ---------- */
+  .clips {
+    width: min(100vw, 860px);
+    max-width: none;
+    max-height: 100dvh;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .clips::backdrop { background: rgb(10 11 12 / 0.82); }
+  .cl-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 10px 10px 10px 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+  .cl-head h2 { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 500; }
+  .cl-close {
+    position: static;
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--rule);
+  }
+  .cl-stage { background: #000; aspect-ratio: 16 / 9; }
+  .cl-stage video { width: 100%; height: 100%; display: block; }
+  .cl-desc { padding: 12px 16px 4px; color: var(--ink-2); font-size: 0.98rem; }
+  .cl-list { list-style: none; margin: 0; padding: 8px 8px 4px; display: grid; gap: 2px; }
+  .cl-list button {
+    display: grid;
+    grid-template-columns: 112px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    padding: 6px 8px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+  }
+  .cl-list button:hover { background: var(--paper-2); }
+  .cl-list button[aria-current='true'] { background: var(--paper-3); }
+  .cl-list img { width: 112px; aspect-ratio: 16 / 9; object-fit: cover; background: var(--paper-3); }
+  .cl-t { font-size: 0.95rem; line-height: 1.3; }
+  .cl-d { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .cl-credit { padding: 6px 16px 16px; font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-3); }
+  @media (max-width: 520px) {
+    .cl-list button { grid-template-columns: 88px 1fr auto; }
+    .cl-list img { width: 88px; }
+  }
+</style>

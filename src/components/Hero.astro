@@ -1,0 +1,87 @@
+---
+import { Image } from 'astro:assets';
+import { getImage, STATS } from '../lib/journey';
+
+const hero = getImage('20250505_181405.jpg');
+---
+
+<section class="hero">
+  <div class="hero-text">
+    <p class="kicker meta">James &amp; Taylor Ward · {STATS.firstYear}–{STATS.lastYear}</p>
+    <h1>Ward Ballpark Tour</h1>
+    <p class="lede">
+      Dad has had Astros season tickets for more than fifty years. It took us until May 2025 to catch the other
+      29 teams at home.
+    </p>
+    <a class="btn start" href="#trip-1992-sd">
+      Start in 1992
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3 8.5 8 13.5l5-5" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+    </a>
+  </div>
+  <figure class="hero-photo">
+    <Image
+      src={hero}
+      alt="Taylor and Dad from behind in matching No. 30 jerseys, looking out over Wrigley Field"
+      widths={[480, 720, 960, 1280]}
+      width={1280}
+      height={Math.round(1280 * hero.height / hero.width)}
+      sizes="(min-width: 960px) 40vw, 100vw"
+      loading="eager"
+      fetchpriority="high"
+      quality={78}
+    />
+    <figcaption class="meta">Wrigley Field, May 5, 2025. Park No. 30.</figcaption>
+  </figure>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: 1.75rem;
+    padding: clamp(1.75rem, 5vw, 4.5rem) var(--gutter) clamp(2rem, 5vw, 4rem);
+  }
+  .kicker { color: var(--ink-3); }
+  h1 {
+    margin-top: 0.75rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3.2rem, 11vw, 7.5rem);
+    line-height: 0.86;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    max-width: 9ch;
+  }
+  .lede {
+    margin-top: 1.5rem;
+    max-width: 30rem;
+    font-size: clamp(1.25rem, 2.4vw, 1.5rem);
+    line-height: 1.4;
+  }
+  .sub {
+    margin-top: 1rem;
+    max-width: 30rem;
+    color: var(--ink-2);
+  }
+  .start { margin-top: 1.75rem; }
+
+  .hero-photo { margin: 0 calc(var(--gutter) * -1); }
+  .hero-photo img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: center 30%;
+    background: var(--paper-3);
+  }
+  figcaption { margin-top: 0.6rem; padding: 0 var(--gutter); color: var(--ink-3); }
+
+  @media (min-width: 960px) {
+    .hero {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      align-items: end;
+      gap: clamp(2rem, 5vw, 5rem);
+    }
+    .hero-photo { margin: 0; }
+    .hero-photo img { aspect-ratio: 3 / 4; max-height: 82svh; }
+    figcaption { padding: 0; }
+  }
+</style>

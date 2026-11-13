@@ -24,8 +24,9 @@ except ImportError:
 
 Image.MAX_IMAGE_PIXELS = None  # disable decompression bomb check for large photos
 
-PHOTOS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos")
-OUTPUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos.json")
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PHOTOS_DIR = os.path.join(ROOT, "src", "assets", "photos")
+OUTPUT = os.path.join(ROOT, "src", "data", "photos.json")
 
 # Stadium data — same as index.html
 STADIUMS = [
@@ -36,13 +37,13 @@ STADIUMS = [
     {"name": "Chase Field", "lat": 33.4453, "lng": -112.0667, "trip": "2006-az"},
     {"name": "Yankee Stadium (Old)", "lat": 40.8296, "lng": -73.9272, "trip": "2008-nyc"},
     {"name": "Yankee Stadium", "lat": 40.8296, "lng": -73.9261, "trip": "nyc-new"},
-    {"name": "Globe Life Park", "lat": 32.7512, "lng": -97.0832, "trip": "2009-tex"},
+    {"name": "Globe Life Park", "lat": 32.7512, "lng": -97.0832, "trip": "2019-tex"},
     {"name": "Angel Stadium", "lat": 33.8003, "lng": -117.8827, "trip": "2014-ana"},
     {"name": "Turner Field", "lat": 33.7350, "lng": -84.3897, "trip": "2014-atl"},
     {"name": "Petco Park", "lat": 32.7076, "lng": -117.1570, "trip": "solo-sd"},
     {"name": "Target Field", "lat": 44.9817, "lng": -93.2781, "trip": "2015-min"},
     {"name": "Rogers Centre", "lat": 43.6414, "lng": -79.3894, "trip": "2015-tor"},
-    {"name": "Fenway Park", "lat": 42.3467, "lng": -71.0972, "trip": "2016-bos"},
+    {"name": "Fenway Park", "lat": 42.3467, "lng": -71.0972, "trip": "2015-bos"},
     {"name": "Coors Field", "lat": 39.7559, "lng": -104.9942, "trip": "coors"},
     {"name": "T-Mobile Park", "lat": 47.5914, "lng": -122.3325, "trip": "2016-sea"},
     {"name": "PNC Park", "lat": 40.4469, "lng": -80.0057, "trip": "2017"},
@@ -61,9 +62,9 @@ STADIUMS = [
     {"name": "American Family Field", "lat": 43.0280, "lng": -87.9712, "trip": "2023-mil"},
     {"name": "Estadio Alfredo Harp Hel\u00fa", "lat": 19.4036, "lng": -99.0853, "trip": "2024-mex"},
     {"name": "Comerica Park", "lat": 42.3390, "lng": -83.0485, "trip": "2024-det"},
-    {"name": "Progressive Field", "lat": 41.4962, "lng": -81.6852, "trip": "2026-final"},
-    {"name": "Guaranteed Rate Field", "lat": 41.8299, "lng": -87.6338, "trip": "2026-final"},
-    {"name": "Wrigley Field", "lat": 41.9484, "lng": -87.6553, "trip": "2026-final"},
+    {"name": "Progressive Field", "lat": 41.4962, "lng": -81.6852, "trip": "2025-final"},
+    {"name": "Guaranteed Rate Field", "lat": 41.8299, "lng": -87.6338, "trip": "2025-final"},
+    {"name": "Wrigley Field", "lat": 41.9484, "lng": -87.6553, "trip": "2025-final"},
 ]
 
 # Trip date ranges for fallback matching when GPS is missing
@@ -73,14 +74,14 @@ TRIP_DATES = {
     "1999-bal": (datetime(1999, 1, 1), datetime(1999, 12, 31)),
     "2006-az": (datetime(2005, 1, 1), datetime(2007, 12, 31)),
     "2008-nyc": (datetime(2008, 8, 10), datetime(2008, 8, 20)),
-    "2009-tex": (datetime(2009, 1, 1), datetime(2009, 12, 31)),
+    "2019-tex": (datetime(2019, 1, 1), datetime(2019, 12, 31)),
     "2014-ana": (datetime(2014, 7, 1), datetime(2014, 7, 10)),
     "2014-atl": (datetime(2014, 1, 1), datetime(2014, 12, 31)),
     "solo-sd": None,  # multiple years
     "2015-tor": (datetime(2015, 6, 3), datetime(2015, 6, 9)),
     "nyc-new": (datetime(2015, 8, 24), datetime(2015, 8, 27)),
     "2015-min": (datetime(2015, 8, 28), datetime(2015, 9, 1)),
-    "2016-bos": (datetime(2016, 5, 10), datetime(2016, 5, 17)),
+    "2015-bos": (datetime(2015, 7, 2), datetime(2015, 7, 6)),
     "coors": None,  # ongoing
     "2016-sea": (datetime(2016, 1, 1), datetime(2016, 12, 31)),
     "2017": (datetime(2017, 6, 28), datetime(2017, 7, 7)),
@@ -92,7 +93,7 @@ TRIP_DATES = {
     "2023-mil": (datetime(2023, 5, 20), datetime(2023, 5, 26)),
     "2024-mex": (datetime(2024, 4, 25), datetime(2024, 4, 30)),
     "2024-det": (datetime(2024, 5, 8), datetime(2024, 5, 14)),
-    "2026-final": (datetime(2026, 5, 1), datetime(2026, 5, 31)),
+    "2025-final": (datetime(2025, 4, 29), datetime(2025, 5, 6)),
 }
 
 MAX_DISTANCE_MILES = 10  # max radius to match a photo to a stadium
@@ -115,6 +116,11 @@ MANUAL_OVERRIDES = {
     "IMG_7779.jpg":             {"stadium": "Minute Maid Park", "trip": "home", "date": None},
     "imagejpeg_0(10).jpg":      {"stadium": "Estadio Alfredo Harp Hel\u00fa", "trip": "2024-mex", "date": None},
     "IMG_0789.jpg":             {"stadium": "Citi Field", "trip": "2022-ne", "date": "2022-06-28"},
+    # EXIF 2017-07-04: the Atlanta game, not Fenway
+    "IMG_1351.jpg":             {"stadium": "Truist Park", "trip": "2017", "date": "2017-07-04"},
+    # EXIF Aug 12-13, 2016, same camera roll as the Rogers Centre shots (Niagara Falls, Toronto skyline)
+    "IMG_3099.JPG":             {"stadium": "Rogers Centre", "trip": "2015-tor", "date": "2016-08-12"},
+    "IMG_3091.JPG":             {"stadium": "Rogers Centre", "trip": "2015-tor", "date": "2016-08-13"},
 }
 
 

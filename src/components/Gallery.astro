@@ -1,0 +1,76 @@
+---
+import { Image } from 'astro:assets';
+import type { Photo } from '../lib/journey';
+import { lightboxSrc } from '../lib/images';
+
+interface Props {
+  photos: Photo[];
+  /** Lightbox set (the chapter id) */
+  set: string;
+  /** Index of the first photo within the set */
+  start?: number;
+}
+const { photos, set, start = 0 } = Astro.props;
+const items = await Promise.all(photos.map(async (p) => ({ p, big: await lightboxSrc(p) })));
+const widthsFor = (w: number) => [280, 480, 720].filter((x) => x < w).concat(Math.min(w, 960));
+---
+
+<div class="gallery">
+  {
+    items.map(({ p, big }, i) => (
+      <a
+        class="ph"
+        href={big}
+        data-lightbox={set}
+        data-index={start + i}
+        data-caption={p.caption ?? p.alt}
+        style={`--r:${p.ratio.toFixed(3)}`}
+      >
+        <Image
+          src={p.img}
+          alt={p.alt}
+          widths={widthsFor(p.img.width)}
+          width={Math.min(p.img.width, 960)}
+          height={Math.round(Math.min(p.img.width, 960) / p.ratio)}
+          sizes="(min-width: 1024px) 20vw, 50vw"
+          loading="lazy"
+          decoding="async"
+          quality={70}
+        />
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  /* Justified rows: every photo keeps its real shape. Items grow in proportion to their
+     aspect ratio, so each row lands at one shared height. */
+  .gallery {
+    --row: 128px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .gallery::after {
+    content: '';
+    flex: 1000 1 0; /* soaks up the last row so it isn't stretched */
+  }
+  .ph {
+    flex: calc(var(--r) * 100) 1 calc(var(--r) * var(--row));
+    display: block;
+    background: var(--paper-3);
+    cursor: zoom-in;
+    overflow: hidden;
+  }
+  .ph img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--r);
+    object-fit: cover;
+    transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.2s;
+  }
+  .ph:hover img { transform: scale(1.03); }
+  @media (min-width: 640px) {
+    .gallery { --row: 150px; }
+  }
+</style>

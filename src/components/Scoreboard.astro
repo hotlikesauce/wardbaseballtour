@@ -1,0 +1,101 @@
+---
+import { STATS } from '../lib/journey';
+
+const slots = [
+  { value: String(STATS.parks), suffix: '/30', label: 'Ballparks' },
+  { value: String(STATS.lastYear - STATS.firstYear), label: `Years, ${STATS.firstYear}–${STATS.lastYear}` },
+  { value: STATS.miles.toLocaleString('en-US'), label: 'Miles of routes on the map' },
+  { value: String(STATS.flights), label: 'Flights' },
+  { value: '50+', label: 'Years of Astros season tickets' },
+];
+---
+
+<section class="board" aria-label="By the numbers">
+  <ul>
+    {
+      slots.map((s) => (
+        <li class:list={{ wide: s.value.length > 4 }}>
+          <span class="plates" aria-label={s.value + (s.suffix ?? '')}>
+            {[...s.value].map((ch) =>
+              ch === ',' ? (
+                <span class="comma" aria-hidden="true">,</span>
+              ) : (
+                <span class="plate" aria-hidden="true">
+                  {ch}
+                </span>
+              ),
+            )}
+            {s.suffix && (
+              <span class="suffix" aria-hidden="true">
+                {s.suffix}
+              </span>
+            )}
+          </span>
+          <span class="label">{s.label}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .board {
+    margin: 0 var(--gutter);
+    padding: clamp(14px, 2.5vw, 22px);
+    background: var(--board);
+    color: var(--board-ink);
+    border: 6px solid var(--board-edge);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 14px;
+  }
+  li { display: grid; gap: 8px; align-content: start; }
+  .plates { display: flex; align-items: flex-end; gap: 3px; }
+  .plate {
+    display: grid;
+    place-items: center;
+    min-width: 1.45em;
+    height: 1.75em;
+    padding: 0 0.12em;
+    background: var(--board-2);
+    border: 1px solid rgb(255 255 255 / 0.07);
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.35);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.45rem, 5.2vw, 2.4rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .comma,
+  .suffix {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.1rem, 3.6vw, 1.6rem);
+    color: var(--board-dim);
+    line-height: 1;
+    padding-bottom: 0.15em;
+  }
+  .suffix { margin-left: 4px; }
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--board-dim);
+  }
+  /* the miles figure is six plates wide; give it the full row on phones */
+  @media (max-width: 719px) {
+    li.wide { grid-column: 1 / -1; }
+  }
+  @media (min-width: 720px) {
+    ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1180px) {
+    ul { grid-template-columns: repeat(5, auto); justify-content: space-between; }
+  }
+</style>

@@ -1,0 +1,140 @@
+---
+import type { Game } from '../lib/journey';
+import { shortDate } from '../lib/journey';
+
+interface Props {
+  game: Game;
+  /** Hide the date/note caption (used inside the October ledger, which has its own) */
+  bare?: boolean;
+}
+const { game, bare = false } = Astro.props;
+const { away, home } = game;
+const innings = Math.max(9, away.innings.length, home.innings.length);
+const cols = Array.from({ length: innings }, (_, i) => i + 1);
+const awayWon = away.r > home.r;
+const played = Math.max(away.innings.length, home.innings.length);
+// past the last inning played: blank (shortened games). Unbatted half-inning: x
+const cell = (t: typeof away, i: number) => (i >= played ? '' : String(t.innings[i] ?? 'x'));
+const tag =
+  game.type === 'W' ? `World Series, Game ${game.seriesGame}` :
+  game.type === 'L' || game.type === 'D' ? `${game.series}, Game ${game.seriesGame}` :
+  null;
+const decisions = [game.w && `W ${game.w}`, game.l && `L ${game.l}`, game.sv && `SV ${game.sv}`].filter(Boolean).join(' · ');
+---
+
+<figure class="ls">
+  {
+    !bare && (
+      <figcaption>
+        <span class="date">{shortDate(game.date)}</span>
+        {tag && <span class="tag">{tag}</span>}
+        {game.note && <span class="note">{game.note}</span>}
+      </figcaption>
+    )
+  }
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col"><span class="visually-hidden">Team</span></th>
+          {cols.map((n) => <th scope="col" class="inn">{n}</th>)}
+          <th scope="col" class="rhe first">R</th>
+          <th scope="col" class="rhe">H</th>
+          <th scope="col" class="rhe">E</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          [
+            { t: away, won: awayWon },
+            { t: home, won: !awayWon },
+          ].map(({ t, won }) => (
+            <tr class:list={{ won }}>
+              <th scope="row">
+                <abbr title={t.name}>{t.abbr}</abbr>
+              </th>
+              {cols.map((n) => (
+                <td class="inn">{cell(t, n - 1)}</td>
+              ))}
+              <td class="rhe first">{t.r}</td>
+              <td class="rhe">{t.h ?? ''}</td>
+              <td class="rhe">{t.e ?? ''}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="foot">
+    {decisions && <p class="dec">{decisions}</p>}
+    {
+      game.clips > 0 && (
+        <button type="button" class="clips" data-clips={game.pk} data-title={`${away.abbr} at ${home.abbr}, ${shortDate(game.date)}`}>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.8v8.4L10 6z" fill="currentColor" /></svg>
+          Watch {game.clips} highlight{game.clips === 1 ? '' : 's'}
+        </button>
+      )
+    }
+  </div>
+</figure>
+
+<style>
+  .ls { margin: 0; }
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+    margin-bottom: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .date { font-weight: 500; }
+  .tag { color: var(--orange-ink); }
+  .note { flex-basis: 100%; font-family: var(--font-body); font-size: 0.92rem; font-style: italic; color: var(--ink-2); }
+  .scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  th, td {
+    padding: 6px 0;
+    text-align: center;
+    border-bottom: 1px solid var(--rule);
+    min-width: 1.6em;
+  }
+  thead th { font-weight: 400; color: var(--ink-3); font-size: 0.68rem; border-bottom-color: var(--rule-strong); }
+  tbody th { text-align: left; padding-right: 0.6em; font-weight: 500; }
+  tbody th abbr { text-decoration: none; }
+  .rhe { font-weight: 500; }
+  .rhe.first { border-left: 1px solid var(--rule); padding-left: 2px; }
+  tr.won th, tr.won .rhe.first { color: var(--win); font-weight: 600; }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-top: 0.45rem;
+  }
+  .dec { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ink-3); }
+  .clips {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    min-height: 32px;
+    padding: 0.25rem 0.7rem 0.25rem 0.6rem;
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+  .clips:hover { background: var(--ink); color: var(--paper); }
+  .clips svg { width: 10px; height: 10px; }
+</style>
