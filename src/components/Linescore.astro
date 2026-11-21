@@ -22,7 +22,7 @@ const tag =
 const decisions = [game.w && `W ${game.w}`, game.l && `L ${game.l}`, game.sv && `SV ${game.sv}`].filter(Boolean).join(' · ');
 ---
 
-<figure class="ls">
+<figure class="ls" style={`--cols:${innings + 3}`}>
   {
     !bare && (
       <figcaption>
@@ -32,7 +32,7 @@ const decisions = [game.w && `W ${game.w}`, game.l && `L ${game.l}`, game.sv && 
       </figcaption>
     )
   }
-  <div class="scroll">
+  <div class="fit">
     <table>
       <thead>
         <tr>
@@ -92,12 +92,13 @@ const decisions = [game.w && `W ${game.w}`, game.l && `L ${game.l}`, game.sv && 
   .date { font-weight: 500; }
   .tag { color: var(--orange-ink); }
   .note { flex-basis: 100%; font-family: var(--font-body); font-size: 0.92rem; font-style: italic; color: var(--ink-2); }
-  .scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+  /* always fits the column: no sideways scroll. Long extra-inning games shrink the type */
   table {
     border-collapse: collapse;
+    table-layout: fixed;
     width: 100%;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: min(0.78rem, calc((100vw - 2rem) / (var(--cols) * 1.5 + 2.6)));
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
@@ -105,10 +106,11 @@ const decisions = [game.w && `W ${game.w}`, game.l && `L ${game.l}`, game.sv && 
     padding: 6px 0;
     text-align: center;
     border-bottom: 1px solid var(--rule);
-    min-width: 1.6em;
+    overflow: hidden;
   }
+  th:first-child { width: 2.6em; }
   thead th { font-weight: 400; color: var(--ink-3); font-size: 0.68rem; border-bottom-color: var(--rule-strong); }
-  tbody th { text-align: left; padding-right: 0.6em; font-weight: 500; }
+  tbody th { text-align: left; padding-right: 0.3em; font-weight: 500; }
   tbody th abbr { text-decoration: none; }
   .rhe { font-weight: 500; }
   .rhe.first { border-left: 1px solid var(--rule); padding-left: 2px; }

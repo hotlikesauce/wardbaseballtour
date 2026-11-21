@@ -21,7 +21,8 @@ const slots = [
                 <span class="comma" aria-hidden="true">,</span>
               ) : (
                 <span class="plate" aria-hidden="true">
-                  {ch}
+                  <span class="tile old">0</span>
+                  <span class="tile new">{ch}</span>
                 </span>
               ),
             )}
@@ -37,6 +38,24 @@ const slots = [
     }
   </ul>
 </section>
+<script is:inline>
+  // A hand-turned board: on load, the operator pulls each 0 and hangs the real number,
+  // slot by slot, at a person's pace. With reduced motion the numbers are simply there.
+  (() => {
+    const board = document.currentScript.previousElementSibling;
+    if (!board || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    board.dataset.armed = '';
+    let t = 400;
+    for (const li of board.querySelectorAll('li')) {
+      for (const plate of li.querySelectorAll('.plate')) {
+        plate.style.setProperty('--d', `${Math.round(t)}ms`);
+        t += 110 + Math.random() * 110;
+      }
+      t += 160 + Math.random() * 240; // walk over to the next slot
+    }
+    requestAnimationFrame(() => board.classList.add('go'));
+  })();
+</script>
 
 <style>
   .board {
@@ -57,20 +76,54 @@ const slots = [
   }
   li { display: grid; gap: 8px; align-content: start; }
   .plates { display: flex; align-items: flex-end; gap: 3px; }
+  /* the hole in the board, and the metal plate hung in it */
   .plate {
+    position: relative;
     display: grid;
-    place-items: center;
     min-width: 1.45em;
     height: 1.75em;
-    padding: 0 0.12em;
-    background: var(--board-2);
-    border: 1px solid rgb(255 255 255 / 0.07);
-    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.35);
+    overflow: hidden;
+    background: #0a1611;
+    box-shadow: inset 0 2px 3px rgb(0 0 0 / 0.6);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: clamp(1.45rem, 5.2vw, 2.4rem);
     line-height: 1;
     font-variant-numeric: tabular-nums;
+  }
+  .tile {
+    grid-area: 1 / 1;
+    display: grid;
+    place-items: center;
+    margin: 1px;
+    padding: 0 0.12em;
+    background:
+      radial-gradient(circle at 22% 9%, rgb(0 0 0 / 0.55) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 78% 9%, rgb(0 0 0 / 0.55) 0 1.5px, transparent 2px),
+      var(--board-2);
+    border: 1px solid rgb(255 255 255 / 0.07);
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.35);
+    transform-origin: 50% 0;
+  }
+  .old { display: none; }
+
+  [data-armed] .old { display: grid; }
+  [data-armed] .new { transform: translateY(-120%); }
+  [data-armed].go .old { animation: pull 0.24s cubic-bezier(0.5, 0, 0.9, 0.4) var(--d) forwards; }
+  [data-armed].go .new { animation: hang 0.75s cubic-bezier(0.25, 0.7, 0.3, 1) calc(var(--d) + 0.2s) forwards; }
+
+  @keyframes pull {
+    0% { transform: none; }
+    25% { transform: translateY(4%) rotate(-2deg); }
+    100% { transform: translateY(-120%) rotate(3deg); }
+  }
+  @keyframes hang {
+    0% { transform: translateY(-120%) rotate(0); }
+    45% { transform: translateY(5%) rotate(-6deg); }
+    62% { transform: translateY(-2%) rotate(4deg); }
+    78% { transform: translateY(1%) rotate(-2deg); }
+    90% { transform: translateY(0) rotate(0.8deg); }
+    100% { transform: none; }
   }
   .comma,
   .suffix {

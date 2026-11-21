@@ -98,3 +98,6 @@
 
 /* fullscreen on phones: the shell becomes the whole screen */
 .map-shell:fullscreen { height: 100dvh !important; }
+
+/* the hover label sits above every pin, and never catches the pointer itself */
+.maplibregl-popup.map-tip { z-index: 20; pointer-events: none; }

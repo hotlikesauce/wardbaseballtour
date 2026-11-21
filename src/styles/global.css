@@ -62,9 +62,12 @@ html {
   text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: 12px;
+  overflow-x: clip; /* never pan sideways on phones; clip (not hidden) keeps the sticky map working */
+  overscroll-behavior-x: none;
 }
 
 body {
+  overflow-x: clip;
   margin: 0;
   background: var(--paper);
   color: var(--ink);
